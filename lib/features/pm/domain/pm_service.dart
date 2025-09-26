@@ -428,6 +428,11 @@ class PMService extends ChangeNotifier {
     _state = newState;
     notifyListeners();
   }
+
+  /// Update state directly (for realtime updates)
+  void updateStateDirectly(PMState newState) {
+    _updateState(newState);
+  }
 }
 
 /// PM state model
