@@ -122,15 +122,18 @@
 
   - task: "Add getAvailableAssignees method to RequestsService"
     implemented: true
-    working: "NA"
+    working: true
     file: "lib/features/requests/domain/requests_service.dart"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
         - agent: "main"
         - comment: "Added getAvailableAssignees method that calls repository method with tenant validation"
+        - working: true
+        - agent: "testing"
+        - comment: "PASSED: Method properly implemented with correct signature (Future<List<UserProfile>> getAvailableAssignees()), tenant validation (if tenantId == null), repository call (_repository.getAvailableAssignees(tenantId)), proper error handling and debug logging. All required patterns validated successfully."
 
   - task: "Add signed URL generation for attachments to StorageHelper"
     implemented: true
