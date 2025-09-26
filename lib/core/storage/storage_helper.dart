@@ -50,6 +50,78 @@ class StorageHelper {
     }
   }
 
+  /// Upload contract document
+  Future<String> uploadContractDocument({
+    required String tenantId,
+    required String contractId,
+    required String fileName,
+    required Uint8List fileBytes,
+    String? contentType,
+  }) async {
+    try {
+      debugPrint('📤 Uploading contract document: $fileName');
+      
+      // Generate tenant-scoped path: contracts/{tenant_id}/{contract_id}/docs/{filename}
+      final path = _generateContractDocPath(
+        tenantId: tenantId,
+        contractId: contractId,
+        fileName: fileName,
+      );
+
+      await SupabaseService.uploadFile(
+        bucket: SupabaseBuckets.attachments,
+        tenantId: tenantId,
+        entity: 'contracts',
+        recordId: contractId,
+        filename: fileName,
+        fileBytes: fileBytes,
+        contentType: contentType,
+      );
+
+      debugPrint('✅ Contract document uploaded successfully: $path');
+      return path;
+    } catch (e) {
+      debugPrint('❌ Contract document upload failed: $e');
+      rethrow;
+    }
+  }
+
+  /// Upload PM visit attachment
+  Future<String> uploadPMAttachment({
+    required String tenantId,
+    required String pmVisitId,
+    required String fileName,
+    required Uint8List fileBytes,
+    String? contentType,
+  }) async {
+    try {
+      debugPrint('📤 Uploading PM attachment: $fileName');
+      
+      // Generate tenant-scoped path: pm/{tenant_id}/{pm_visit_id}/{filename}
+      final path = _generatePMAttachmentPath(
+        tenantId: tenantId,
+        pmVisitId: pmVisitId,
+        fileName: fileName,
+      );
+
+      await SupabaseService.uploadFile(
+        bucket: SupabaseBuckets.attachments,
+        tenantId: tenantId,
+        entity: 'pm',
+        recordId: pmVisitId,
+        filename: fileName,
+        fileBytes: fileBytes,
+        contentType: contentType,
+      );
+
+      debugPrint('✅ PM attachment uploaded successfully: $path');
+      return path;
+    } catch (e) {
+      debugPrint('❌ PM attachment upload failed: $e');
+      rethrow;
+    }
+  }
+
   /// Upload multiple files for request
   Future<List<String>> uploadRequestFiles({
     required String tenantId,
