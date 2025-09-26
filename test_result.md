@@ -219,9 +219,11 @@
 
 ## test_plan:
   current_focus:
-    - "Add getAvailableAssignees method to RequestsRepository"
-    - "Add getAvailableAssignees method to RequestsService"
-    - "Refactor request detail page to match exact layout specification"
+    - "Implement Requests Realtime bindings with selective updates and notifications"
+    - "Implement PM Realtime bindings with completion notifications"
+    - "Add Connection Indicators and Realtime UI Integration"
+    - "Test Realtime subscription wiring and tenant filtering"
+    - "Test debounce/reducer updates and notification triggers"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
