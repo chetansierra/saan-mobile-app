@@ -307,6 +307,7 @@ class _RequestDetailPageState extends ConsumerState<RequestDetailPage> {
             _buildStickyBottomBar(context),
         ],
       ),
+      ),
     );
   }
 
