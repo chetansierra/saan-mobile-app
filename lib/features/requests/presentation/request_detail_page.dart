@@ -290,7 +290,8 @@ class _RequestDetailPageState extends ConsumerState<RequestDetailPage> {
   Widget build(BuildContext context) {
     final authService = ref.watch(authServiceProvider);
     
-    return Scaffold(
+    return RequestsRealtimeHook(
+      child: Scaffold(
       body: Column(
         children: [
           // Sticky Header
