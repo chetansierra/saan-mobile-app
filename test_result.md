@@ -107,15 +107,18 @@
 ## backend:
   - task: "Add getAvailableAssignees method to RequestsRepository"
     implemented: true
-    working: "NA"
+    working: true
     file: "lib/features/requests/data/requests_repository.dart"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
         - agent: "main"
         - comment: "Added getAvailableAssignees method to query profiles table for admin users in tenant"
+        - working: true
+        - agent: "testing"
+        - comment: "PASSED: Method properly implemented with tenant filtering (.eq('tenant_id', tenantId)), admin role filtering (.eq('role', 'admin')), proper error handling (PostgrestException catch), debug logging, and name ordering. All required patterns validated successfully."
 
   - task: "Add getAvailableAssignees method to RequestsService"
     implemented: true
