@@ -362,7 +362,7 @@ class PMRealtimeManager {
       if (hasChanges) {
         final newState = _pmService.state.copyWith(visits: currentVisits);
         // Update service state directly (bypassing normal methods)
-        _pmService._updateState(newState);
+        _pmService.updateStateDirectly(newState);
         
         debugPrint('✅ [PMRT] Applied selective updates to PM service');
       }
