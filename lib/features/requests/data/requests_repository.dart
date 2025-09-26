@@ -270,13 +270,14 @@ class RequestsRepository {
     }
   }
 
-  /// Get KPI data for dashboard
+  /// Get KPI data for dashboard including contracts and PM data
   Future<RequestKPIs> getKPIs(String tenantId) async {
     try {
       debugPrint('📊 Fetching KPIs for tenant: $tenantId');
       
       final now = DateTime.now();
       final sevenDaysAgo = now.subtract(const Duration(days: 7));
+      final thirtyDaysFromNow = now.add(const Duration(days: 30));
       
       // Get open requests count
       final openResponse = await _client
@@ -342,11 +343,60 @@ class RequestsRepository {
         }
       }
 
+      // Get contracts expiring within 30 days
+      int expiringContracts = 0;
+      try {
+        final contractsResponse = await _client
+            .from(SupabaseTables.contracts)
+            .select('id', const FetchOptions(count: CountOption.exact, head: true))
+            .eq('tenant_id', tenantId)
+            .eq('is_active', true)
+            .lte('end_date', thirtyDaysFromNow.toIso8601String())
+            .gte('end_date', now.toIso8601String());
+
+        expiringContracts = contractsResponse.count ?? 0;
+      } catch (e) {
+        debugPrint('⚠️ Failed to fetch expiring contracts: $e');
+      }
+
+      // Get PM visits metrics
+      int pmUpcoming = 0;
+      int pmDueToday = 0;
+      int pmOverdue = 0;
+      
+      try {
+        final pmVisitsResponse = await _client
+            .from(SupabaseTables.pmVisits)
+            .select('id, scheduled_date')
+            .eq('tenant_id', tenantId)
+            .inFilter('status', ['scheduled', 'in_progress']);
+
+        final pmVisitsResult = pmVisitsResponse as List<dynamic>;
+        pmUpcoming = pmVisitsResult.length;
+
+        for (final visit in pmVisitsResult) {
+          final scheduledDate = DateTime.parse(visit['scheduled_date'] as String);
+          final scheduledDay = DateTime(scheduledDate.year, scheduledDate.month, scheduledDate.day);
+          
+          if (scheduledDay.isBefore(today)) {
+            pmOverdue++;
+          } else if (scheduledDay.isAtSameMomentAs(today)) {
+            pmDueToday++;
+          }
+        }
+      } catch (e) {
+        debugPrint('⚠️ Failed to fetch PM visits: $e');
+      }
+
       final kpis = RequestKPIs(
         openRequests: openCount,
         overdueRequests: overdueCount,
         dueTodayRequests: dueTodayCount,
         avgTtrHours: avgTtrHours,
+        expiringContracts: expiringContracts,
+        pmUpcoming: pmUpcoming,
+        pmDueToday: pmDueToday,
+        pmOverdue: pmOverdue,
       );
       
       debugPrint('✅ KPIs fetched successfully: $kpis');
