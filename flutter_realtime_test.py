@@ -74,7 +74,7 @@ class FlutterRealtimeBackendTester:
                 'pending_events': 'final Map<String, List<RealtimeEvent>> _pendingEvents',
                 'tenant_scoped_channels': 'final channelKey = \'${table}_$tenantId\'',
                 'tenant_filters': 'final tenantFilters = {\n        \'tenant_id\': \'eq.$tenantId\'',
-                'event_filtering': 'if (![\\'INSERT\\', \\'UPDATE\\'].contains(eventType))',
+                'event_filtering': "if (!['INSERT', 'UPDATE'].contains(eventType))",
                 'cross_tenant_validation': 'if (recordTenantId != currentTenantId)',
                 'reconnection_logic': 'void _scheduleReconnect()',
                 'max_reconnect_attempts': 'static const int _maxReconnectAttempts = 5',
