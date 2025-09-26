@@ -137,7 +137,7 @@
 
   - task: "Add signed URL generation for attachments to StorageHelper"
     implemented: true
-    working: "NA"
+    working: true
     file: "lib/core/storage/storage_helper.dart"
     stuck_count: 0
     priority: "medium"
@@ -146,6 +146,9 @@
         - working: "NA"
         - agent: "main"
         - comment: "StorageHelper already has getSignedUrl method implemented - no changes needed"
+        - working: true
+        - agent: "testing"
+        - comment: "PASSED: getSignedUrl method properly implemented with correct signature (Future<String> getSignedUrl), path parameter, expires parameter (default 3600s), SupabaseService.getSignedUrl call, attachments bucket usage, proper error handling and debug logging. Batch getSignedUrls method also available."
 
 ## frontend:
   - task: "Refactor request detail page to match exact layout specification"
