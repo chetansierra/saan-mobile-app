@@ -271,6 +271,21 @@ class RequestsService extends ChangeNotifier {
     }
   }
 
+  /// Get available assignees (admin users) for the tenant
+  Future<List<UserProfile>> getAvailableAssignees() async {
+    try {
+      final tenantId = _tenantId;
+      if (tenantId == null) {
+        throw Exception('No tenant context available');
+      }
+
+      return await _repository.getAvailableAssignees(tenantId);
+    } catch (e) {
+      debugPrint('❌ Failed to get available assignees: $e');
+      rethrow;
+    }
+  }
+
   /// Check if request matches current filters
   bool _matchesFilters(ServiceRequest request) {
     final filters = _state.filters;
