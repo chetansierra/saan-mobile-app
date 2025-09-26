@@ -4,10 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../app/theme.dart';
+import '../../../core/ui/connection_indicator.dart';
 import '../../auth/domain/auth_service.dart';
 import '../../auth/domain/models/user_profile.dart';
 import '../domain/models/request.dart';
 import '../domain/requests_service.dart';
+import '../realtime/requests_realtime.dart';
 import 'widgets/assignee_picker.dart';
 import 'widgets/attachment_gallery.dart';
 import 'widgets/sla_badge.dart';
