@@ -5,6 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/domain/auth_service.dart';
 import '../features/auth/presentation/sign_in_page.dart';
 import '../features/auth/presentation/verify_email_page.dart';
+import '../features/onboarding/presentation/company_setup_page.dart';
+import '../features/onboarding/presentation/facility_setup_page.dart';
+import '../features/onboarding/presentation/onboarding_review_page.dart';
 
 /// Router configuration provider for the app
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -62,30 +65,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const VerifyEmailPage(),
       ),
 
-      // Onboarding routes (placeholder for Round 3)
+      // Onboarding routes
       GoRoute(
         path: '/onboarding/company',
         name: 'onboardingCompany',
-        builder: (context, state) => const _PlaceholderPage(
-          title: 'Company Setup',
-          message: 'Onboarding flow will be implemented in Round 3',
-        ),
+        builder: (context, state) => const CompanySetupPage(),
       ),
       GoRoute(
         path: '/onboarding/facility-new',
         name: 'onboardingFacility',
-        builder: (context, state) => const _PlaceholderPage(
-          title: 'Facility Setup',
-          message: 'Facility creation flow will be implemented in Round 3',
-        ),
+        builder: (context, state) => const FacilitySetupPage(),
       ),
       GoRoute(
         path: '/onboarding/review',
         name: 'onboardingReview',
-        builder: (context, state) => const _PlaceholderPage(
-          title: 'Review & Complete',
-          message: 'Onboarding review will be implemented in Round 3',
-        ),
+        builder: (context, state) => const OnboardingReviewPage(),
       ),
 
       // Main app routes (placeholder for future rounds)
@@ -94,7 +88,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'home',
         builder: (context, state) => const _PlaceholderPage(
           title: 'Dashboard',
-          message: 'Home dashboard will be implemented in future rounds',
+          message: 'Welcome to CUERON SAAN! Your setup is complete.',
           showAppBar: true,
         ),
       ),
@@ -183,7 +177,7 @@ class _PlaceholderPage extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.construction,
+                title == 'Dashboard' ? Icons.dashboard : Icons.construction,
                 size: 64,
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -201,11 +195,36 @@ class _PlaceholderPage extends ConsumerWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              if (showAppBar) ...[
+              if (showAppBar && title != 'Dashboard') ...[
                 const SizedBox(height: 32),
                 FilledButton(
                   onPressed: () => context.go('/home'),
                   child: const Text('Go to Dashboard'),
+                ),
+              ],
+              if (title == 'Dashboard') ...[
+                const SizedBox(height: 32),
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 16,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    FilledButton.icon(
+                      onPressed: () => context.go('/requests'),
+                      icon: const Icon(Icons.build),
+                      label: const Text('Requests'),
+                    ),
+                    FilledButton.icon(
+                      onPressed: () => context.go('/contracts'),
+                      icon: const Icon(Icons.description),
+                      label: const Text('Contracts'),
+                    ),
+                    FilledButton.icon(
+                      onPressed: () => context.go('/profile'),
+                      icon: const Icon(Icons.person),
+                      label: const Text('Profile'),
+                    ),
+                  ],
                 ),
               ],
             ],
