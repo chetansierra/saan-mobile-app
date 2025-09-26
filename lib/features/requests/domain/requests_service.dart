@@ -146,7 +146,7 @@ class RequestsService extends ChangeNotifier {
     await applyFilters(filters);
   }
 
-  /// Create new request
+  /// Create new request with contract-based SLA derivation
   Future<ServiceRequest> createRequest({
     required String facilityId,
     required RequestType type,
@@ -161,8 +161,26 @@ class RequestsService extends ChangeNotifier {
         throw Exception('No tenant context available');
       }
 
-      debugPrint('📝 Creating new request');
+      debugPrint('📝 Creating new request: $description');
       _updateState(_state.copyWithLoading(true));
+
+      // Derive SLA from active contracts
+      Duration? derivedSla;
+      try {
+        derivedSla = await SlaRules.deriveSlaForRequest(
+          facilityId: facilityId,
+          priority: priority,
+          serviceType: type.value, // Pass service type for matching
+        );
+        
+        if (derivedSla != null) {
+          debugPrint('🎯 Applied contract-based SLA: ${derivedSla.inHours}h');
+        } else {
+          debugPrint('📋 Using default SLA (no contract match)');
+        }
+      } catch (e) {
+        debugPrint('⚠️ SLA derivation failed, using defaults: $e');
+      }
 
       final request = ServiceRequest(
         tenantId: tenantId,
@@ -172,6 +190,7 @@ class RequestsService extends ChangeNotifier {
         description: description,
         preferredWindow: preferredWindow,
         mediaUrls: mediaUrls ?? [],
+        customSla: derivedSla,
       );
 
       final createdRequest = await _repository.createRequest(
@@ -195,7 +214,7 @@ class RequestsService extends ChangeNotifier {
         ));
       }
 
-      debugPrint('✅ Request created successfully');
+      debugPrint('✅ Request created successfully with SLA: ${createdRequest.slaDueAt != null ? "${createdRequest.slaDueAt!.difference(createdRequest.createdAt ?? DateTime.now()).inHours}h" : "none"}');
       return createdRequest;
     } catch (e) {
       debugPrint('❌ Failed to create request: $e');
