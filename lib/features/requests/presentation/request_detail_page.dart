@@ -871,26 +871,35 @@ class _RequestDetailPageState extends ConsumerState<RequestDetailPage> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  /// Build enhanced detail row with icon
+  Widget _buildDetailRow(String label, String value, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppTheme.spacingS),
+      padding: const EdgeInsets.only(bottom: AppTheme.spacingM),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Icon(
+            icon,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          ),
+          const SizedBox(width: AppTheme.spacingS),
           SizedBox(
-            width: 120,
+            width: 100,
             child: Text(
               '$label:',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
+          const SizedBox(width: AppTheme.spacingS),
           Expanded(
             child: Text(
               value,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -899,42 +908,83 @@ class _RequestDetailPageState extends ConsumerState<RequestDetailPage> {
     );
   }
 
-  Widget _buildActionSection() {
+  /// Build sticky bottom bar with admin actions
+  Widget _buildStickyBottomBar(BuildContext context) {
     final currentStatusIndex = RequestStatus.values.indexOf(_request!.status);
     final nextStatus = currentStatusIndex < RequestStatus.values.length - 1
         ? RequestStatus.values[currentStatusIndex + 1]
         : null;
 
-    if (nextStatus == null) {
-      return const SizedBox.shrink();
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacingL),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Admin Actions',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
+    return Container(
+      padding: EdgeInsets.only(
+        left: AppTheme.spacingL,
+        right: AppTheme.spacingL,
+        top: AppTheme.spacingM,
+        bottom: MediaQuery.of(context).padding.bottom + AppTheme.spacingM,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, -2),
+          ),
+        ],
+        border: Border(
+          top: BorderSide(
+            color: Theme.of(context).dividerColor,
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Update Status button
+          if (nextStatus != null) ...[
+            Expanded(
+              flex: 2,
+              child: FilledButton(
+                onPressed: _isUpdating ? null : () => _updateStatus(nextStatus),
+                child: _isUpdating
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text('Mark as ${nextStatus.displayName}'),
               ),
             ),
-            const SizedBox(height: AppTheme.spacingM),
             
-            FilledButton(
-              onPressed: _isUpdating ? null : () => _updateStatus(nextStatus),
-              child: _isUpdating
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text('Mark as ${nextStatus.displayName}'),
-            ),
+            const SizedBox(width: AppTheme.spacingM),
           ],
-        ),
+          
+          // Assign Engineer button
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: _isUpdating ? null : _showAssigneePickerBottomSheet,
+              icon: const Icon(Icons.person_add, size: 18),
+              label: const Text('Assign Engineer'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Show assignee picker bottom sheet
+  void _showAssigneePickerBottomSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => AssigneePicker(
+        availableAssignees: _availableAssignees,
+        currentAssignee: _request!.assignedEngineerName,
+        onAssigneeSelected: _assignEngineer,
+        isLoading: _isLoadingAssignees,
       ),
     );
   }
