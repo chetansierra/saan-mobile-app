@@ -368,6 +368,14 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  /// Refresh/reinitialize auth service (used after onboarding completion)
+  Future<void> initialize() async {
+    final user = _repository.getCurrentUser();
+    if (user != null) {
+      await _bootstrapUserProfile(user);
+    }
+  }
+
   /// Update internal state and notify listeners
   void _updateState(AuthState newState) {
     _state = newState;
