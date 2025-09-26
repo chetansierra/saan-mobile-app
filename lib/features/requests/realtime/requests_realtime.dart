@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/realtime/realtime_client.dart';
 import '../../../core/ui/snackbar_notifier.dart';
+import '../../auth/domain/auth_service.dart';
 import '../domain/requests_service.dart';
 import '../domain/models/request.dart';
 
@@ -14,6 +16,7 @@ final requestsRealtimeProvider = Provider<RequestsRealtimeManager>((ref) {
     ref.watch(realtimeClientProvider),
     ref.watch(requestsServiceProvider),
     ref.watch(snackbarNotifierProvider),
+    ref.watch(authServiceProvider),
   );
 });
 
