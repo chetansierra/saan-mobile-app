@@ -26,14 +26,20 @@ class RequestsRealtimeManager {
     this._realtimeClient,
     this._requestsService,
     this._snackbarNotifier,
+    this._authService,
   );
 
   final RealtimeClient _realtimeClient;
   final RequestsService _requestsService;
   final SnackbarNotifier _snackbarNotifier;
+  final AuthService _authService;
 
   StreamSubscription<EventBatch>? _subscription;
   final Set<String> _processedEventIds = {};
+  final Map<String, DateTime> _lastNotificationTimes = {};
+  final Map<String, ServiceRequest> _lastKnownStates = {};
+  
+  static const Duration _notificationCooldown = Duration(seconds: 10);
 
   /// Subscribe to requests realtime updates
   void subscribe() {
