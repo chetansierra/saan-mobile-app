@@ -101,3 +101,86 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+## user_problem_statement: "Complete the request detail page with the exact layout specified: Header (sticky): [Request #ID] • [Status chip] • [Priority chip], Top row: [SLA Badge (countdown)] [Assignee Picker], Sections (scroll): 1) Details: facility, createdAt, createdBy, description, 2) Attachments: AttachmentGallery, 3) Timeline: StatusTimeline, 4) Notes (optional): list of admin notes, Bottom bar (sticky for admins): [Update Status] [Assign Engineer]"
+
+## backend:
+  - task: "Add getAvailableAssignees method to RequestsRepository"
+    implemented: false
+    working: "NA"
+    file: "lib/features/requests/data/requests_repository.dart"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Method is called in request_detail_page.dart but doesn't exist in repository"
+
+  - task: "Add getAvailableAssignees method to RequestsService"
+    implemented: false
+    working: "NA"
+    file: "lib/features/requests/domain/requests_service.dart"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Method is called in request_detail_page.dart but doesn't exist in service"
+
+  - task: "Add signed URL generation for attachments to StorageHelper"
+    implemented: false
+    working: "NA"
+    file: "lib/core/storage/storage_helper.dart"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Method is called in attachment_gallery.dart but need to verify if it exists"
+
+## frontend:
+  - task: "Refactor request detail page to match exact layout specification"
+    implemented: false
+    working: "NA"
+    file: "lib/features/requests/presentation/request_detail_page.dart"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Current layout needs restructuring to match sticky header, top row, scrollable sections, and sticky bottom bar"
+
+  - task: "Enhance StatusTimeline widget to show timestamps and notes"
+    implemented: false
+    working: "NA"
+    file: "lib/features/requests/presentation/widgets/status_timeline.dart"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Current timeline shows basic status progression but needs timestamps and admin notes"
+
+## metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+## test_plan:
+  current_focus:
+    - "Add getAvailableAssignees method to RequestsRepository"
+    - "Add getAvailableAssignees method to RequestsService"
+    - "Refactor request detail page to match exact layout specification"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+## agent_communication:
+    - agent: "main"
+    - message: "Starting implementation of request detail page completion with backend repository methods and exact layout restructuring as specified by user"
