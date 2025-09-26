@@ -72,7 +72,8 @@ class _RequestListPageState extends ConsumerState<RequestListPage> {
   Widget build(BuildContext context) {
     final requestsState = ref.watch(requestsServiceProvider).state;
 
-    return Scaffold(
+    return RequestsRealtimeHook(
+      child: Scaffold(
       appBar: AppBar(
         title: const Text('Requests'),
         actions: [
