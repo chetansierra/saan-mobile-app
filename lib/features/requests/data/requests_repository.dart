@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/supabase/client.dart';
+import '../../auth/domain/models/user_profile.dart';
 import '../domain/models/request.dart';
 
 /// Repository for request-related database operations
