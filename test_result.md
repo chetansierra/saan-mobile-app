@@ -208,6 +208,18 @@
         - agent: "testing"
         - comment: "PASSED: ConnectionIndicator properly implemented with all connection states (connecting/connected/disconnected/reconnecting), subtle display (hidden when connected unless showLabel=true), animated opacity transitions, proper color coding (green/orange/red), loading indicators, retry functionality, and FloatingConnectionIndicator for page integration. All state management and UI patterns correctly implemented."
 
+  - task: "Core Realtime Infrastructure (RealtimeClient & SnackbarNotifier)"
+    implemented: true
+    working: true
+    file: "lib/core/realtime/realtime_client.dart, lib/core/ui/snackbar_notifier.dart"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "PASSED: Core realtime infrastructure properly implemented. RealtimeClient: Supabase channel management with tenant-scoped subscriptions, 300ms debouncing, event processing (INSERT/UPDATE only), connection states (connecting/connected/disconnected/reconnecting), exponential backoff reconnection (≤30s), tenant isolation, cross-tenant validation, memory cleanup. SnackbarNotifier: Priority-styled notifications with correct styling and durations - critical (red, 6s), warning (amber, 6s), success (green, 4s), info (default, 3s), floating behavior, action support. All patterns validated successfully."
+
   - task: "Enhance StatusTimeline widget to show timestamps and notes"
     implemented: false
     working: "NA"
