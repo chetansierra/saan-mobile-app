@@ -473,7 +473,7 @@ class FlutterRealtimeBackendTester:
             
             # Check event processing patterns
             processing_checks = {
-                'event_type_filtering': 'if (![\\'INSERT\\', \\'UPDATE\\'].contains(eventType))',
+                'event_type_filtering': "if (!['INSERT', 'UPDATE'].contains(eventType))",
                 'tenant_validation': 'if (recordTenantId != currentTenantId)',
                 'duplicate_prevention': 'if (_processedEventIds.contains(eventId))',
                 'event_id_generation': 'String _generateEventId(RealtimeEvent event)',
