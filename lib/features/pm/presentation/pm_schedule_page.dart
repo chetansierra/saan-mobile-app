@@ -66,7 +66,8 @@ class _PMSchedulePageState extends ConsumerState<PMSchedulePage>
   Widget build(BuildContext context) {
     final authService = ref.watch(authServiceProvider);
     
-    return Scaffold(
+    return PMRealtimeHook(
+      child: Scaffold(
       appBar: AppBar(
         title: const Text('PM Schedule'),
         leading: IconButton(
