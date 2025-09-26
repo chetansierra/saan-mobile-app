@@ -289,14 +289,21 @@ class _RequestDetailPageState extends ConsumerState<RequestDetailPage> {
     final authService = ref.watch(authServiceProvider);
     
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Request #${widget.requestId.substring(0, 8)}'),
-        leading: IconButton(
-          onPressed: () => context.go('/requests'),
-          icon: const Icon(Icons.arrow_back),
-        ),
+      body: Column(
+        children: [
+          // Sticky Header
+          _buildStickyHeader(context),
+          
+          // Main Content (expandable to fill remaining space)
+          Expanded(
+            child: _buildMainContent(authService),
+          ),
+          
+          // Sticky Bottom Bar (for admins only)
+          if (authService.isAdmin && _request != null) 
+            _buildStickyBottomBar(context),
+        ],
       ),
-      body: _buildBody(authService),
     );
   }
 
