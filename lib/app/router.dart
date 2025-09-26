@@ -8,6 +8,9 @@ import '../features/auth/presentation/verify_email_page.dart';
 import '../features/onboarding/presentation/company_setup_page.dart';
 import '../features/onboarding/presentation/facility_setup_page.dart';
 import '../features/onboarding/presentation/onboarding_review_page.dart';
+import '../features/home/home_page.dart';
+import '../features/requests/presentation/create_request_page.dart';
+import '../features/requests/presentation/request_list_page.dart';
 
 /// Router configuration provider for the app
 final appRouterProvider = Provider<GoRouter>((ref) {
