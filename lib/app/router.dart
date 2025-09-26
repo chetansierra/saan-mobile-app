@@ -11,6 +11,12 @@ import '../features/onboarding/presentation/onboarding_review_page.dart';
 import '../features/home/home_page.dart';
 import '../features/requests/presentation/create_request_page.dart';
 import '../features/requests/presentation/request_list_page.dart';
+import '../features/requests/presentation/request_detail_page.dart';
+import '../features/contracts/presentation/contract_list_page.dart';
+import '../features/contracts/presentation/create_contract_page.dart';
+import '../features/contracts/presentation/contract_detail_page.dart';
+import '../features/pm/presentation/pm_schedule_page.dart';
+import '../features/pm/presentation/pm_visit_detail_page.dart';
 
 /// Router configuration provider for the app
 final appRouterProvider = Provider<GoRouter>((ref) {
