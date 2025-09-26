@@ -106,10 +106,22 @@ class AuthService extends ChangeNotifier {
       if (profile != null) {
         debugPrint('✅ Profile found: ${profile.name} (${profile.role.displayName})');
         
-        _updateState(_state.copyWithAuth(
-          user: user,
-          profile: profile,
-        ));
+        // Check if user has facilities (required for complete profile)
+        final hasFacilities = await _onboardingRepository.hasFacilities(profile.tenantId);
+        
+        if (hasFacilities) {
+          debugPrint('✅ Profile complete with facilities');
+          _updateState(_state.copyWithAuth(
+            user: user,
+            profile: profile,
+          ));
+        } else {
+          debugPrint('⚠️ Profile exists but no facilities found - incomplete onboarding');
+          _updateState(_state.copyWithAuth(
+            user: user,
+            profile: null, // Set to null to trigger onboarding
+          ));
+        }
       } else {
         debugPrint('⚠️ No profile found, user needs onboarding');
         
