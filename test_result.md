@@ -240,11 +240,7 @@
 
 ## test_plan:
   current_focus:
-    - "Implement Requests Realtime bindings with selective updates and notifications"
-    - "Implement PM Realtime bindings with completion notifications"
-    - "Add Connection Indicators and Realtime UI Integration"
-    - "Test Realtime subscription wiring and tenant filtering"
-    - "Test debounce/reducer updates and notification triggers"
+    - "Refactor request detail page to match exact layout specification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
