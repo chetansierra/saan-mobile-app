@@ -650,7 +650,8 @@ class _RequestDetailPageState extends ConsumerState<RequestDetailPage> {
     );
   }
 
-  Widget _buildHeaderCard() {
+  /// Build details section: facility, createdAt, createdBy, description
+  Widget _buildDetailsSection() {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppTheme.spacingL),
@@ -659,135 +660,173 @@ class _RequestDetailPageState extends ConsumerState<RequestDetailPage> {
           children: [
             Row(
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _request!.description,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: AppTheme.spacingS),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.location_city,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                          ),
-                          const SizedBox(width: AppTheme.spacingXS),
-                          Expanded(
-                            child: Text(
-                              _request!.facilityName ?? 'Unknown Facility',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                Icon(
+                  Icons.info_outline,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
                 ),
-                
-                // Priority badge
-                if (_request!.priority == RequestPriority.critical)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTheme.spacingS,
-                      vertical: AppTheme.spacingXS,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(AppTheme.radiusS),
-                      border: Border.all(color: Colors.red.withOpacity(0.3)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.priority_high,
-                          size: 16,
-                          color: Colors.red,
-                        ),
-                        const SizedBox(width: AppTheme.spacingXS),
-                        Text(
-                          'CRITICAL',
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.red,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-            
-            const SizedBox(height: AppTheme.spacingM),
-            
-            // SLA badge and timestamps
-            Row(
-              children: [
-                if (_request!.slaDueAt != null) ...[
-                  SLABadge(
-                    slaDueAt: _request!.slaDueAt,
-                    showBreachAlert: false,
-                    size: SLABadgeSize.large,
-                  ),
-                ] else ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTheme.spacingM,
-                      vertical: AppTheme.spacingS,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(AppTheme.radiusS),
-                      border: Border.all(color: Colors.blue.withOpacity(0.3)),
-                    ),
-                    child: Text(
-                      'Standard Priority',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-                
-                const Spacer(),
-                
+                const SizedBox(width: AppTheme.spacingS),
                 Text(
-                  'Created ${DateFormat('MMM dd, yyyy HH:mm').format(_request!.createdAt ?? DateTime.now())}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  'Request Details',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
             
-            // SLA breach alert
-            if (_request!.slaDueAt != null && SlaUtils.isOverdue(_request!.slaDueAt)) ...[
-              const SizedBox(height: AppTheme.spacingM),
-              SLABadge(
-                slaDueAt: _request!.slaDueAt,
-                showBreachAlert: true,
+            const SizedBox(height: AppTheme.spacingL),
+            
+            // Description with better typography
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppTheme.spacingM),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(AppTheme.radiusM),
               ),
-            ],
+              child: Text(
+                _request!.description,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  height: 1.5,
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: AppTheme.spacingL),
+            
+            // Details grid
+            _buildDetailRow('Facility', _request!.facilityName ?? 'Unknown Facility', Icons.location_city),
+            _buildDetailRow('Created', DateFormat('MMM dd, yyyy HH:mm').format(_request!.createdAt ?? DateTime.now()), Icons.schedule),
+            _buildDetailRow('Type', _request!.type.displayName, Icons.category),
+            
+            if (_request!.preferredWindow != null)
+              _buildDetailRow(
+                'Preferred Window',
+                '${DateFormat('MMM dd, HH:mm').format(_request!.preferredWindow!.startTime)} - '
+                '${DateFormat('HH:mm').format(_request!.preferredWindow!.endTime)}',
+                Icons.access_time,
+              ),
+            
+            if (_request!.eta != null)
+              _buildDetailRow(
+                'ETA',
+                DateFormat('MMM dd, yyyy HH:mm').format(_request!.eta!),
+                Icons.schedule_send,
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStatusSection() {
+  /// Build attachments section with gallery
+  Widget _buildAttachmentsSection() {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppTheme.spacingL),
-        child: StatusTimeline(currentStatus: _request!.status),
+        child: AttachmentGallery(
+          attachmentPaths: _request!.mediaUrls,
+          isReadOnly: true,
+        ),
+      ),
+    );
+  }
+
+  /// Build timeline section showing status progression
+  Widget _buildTimelineSection() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingL),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.timeline,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: AppTheme.spacingS),
+                Text(
+                  'Status Timeline',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: AppTheme.spacingM),
+            
+            StatusTimeline(currentStatus: _request!.status),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build notes section (optional admin notes from status changes)
+  Widget _buildNotesSection() {
+    // For now, this is a placeholder for future admin notes functionality
+    // In a real implementation, you would fetch notes from the database
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingL),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.note_alt_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: AppTheme.spacingS),
+                Text(
+                  'Admin Notes',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: AppTheme.spacingM),
+            
+            // Placeholder for notes
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppTheme.spacingL),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(AppTheme.radiusM),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.note_add,
+                    size: 48,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                  ),
+                  const SizedBox(height: AppTheme.spacingS),
+                  Text(
+                    'No admin notes available',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
