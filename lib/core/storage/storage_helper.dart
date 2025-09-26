@@ -283,13 +283,31 @@ class StorageHelper {
     }
   }
 
-  /// Generate storage path for request file
+  /// Generate path for request file
   String _generateRequestFilePath({
     required String tenantId,
     required String requestId,
     required String fileName,
   }) {
-    return '$tenantId/requests/$requestId/$fileName';
+    return 'attachments/$tenantId/requests/$requestId/$fileName';
+  }
+
+  /// Generate path for contract document
+  String _generateContractDocPath({
+    required String tenantId,
+    required String contractId,
+    required String fileName,
+  }) {
+    return 'contracts/$tenantId/$contractId/docs/$fileName';
+  }
+
+  /// Generate path for PM attachment
+  String _generatePMAttachmentPath({
+    required String tenantId,
+    required String pmVisitId,
+    required String fileName,
+  }) {
+    return 'pm/$tenantId/$pmVisitId/$fileName';
   }
 
   /// Allowed file extensions
