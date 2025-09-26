@@ -365,6 +365,11 @@ class RequestsService extends ChangeNotifier {
     _state = newState;
     notifyListeners();
   }
+
+  /// Update state directly (for realtime updates)
+  void updateStateDirectly(RequestsState newState) {
+    _updateState(newState);
+  }
 }
 
 /// Requests state model
