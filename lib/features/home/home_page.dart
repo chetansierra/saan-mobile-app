@@ -110,43 +110,223 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _buildKpiGrid(RequestKPIs kpis) {
+    return Column(
+      children: [
+        // Main request KPIs
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          crossAxisSpacing: AppTheme.spacingM,
+          mainAxisSpacing: AppTheme.spacingM,
+          childAspectRatio: 1.2,
+          children: [
+            _buildKpiCard(
+              title: 'Open Requests',
+              value: kpis.openRequests.toString(),
+              icon: Icons.pending_actions,
+              color: Colors.blue,
+              onTap: () => context.go('/requests'),
+            ),
+            _buildKpiCard(
+              title: 'Overdue',
+              value: kpis.overdueRequests.toString(),
+              icon: Icons.warning,
+              color: Colors.red,
+              onTap: () => context.go('/requests'),
+            ),
+            _buildKpiCard(
+              title: 'Due Today',
+              value: kpis.dueTodayRequests.toString(),
+              icon: Icons.today,
+              color: Colors.orange,
+              onTap: () => context.go('/requests'),
+            ),
+            _buildKpiCard(
+              title: 'Avg. TTR',
+              value: '${kpis.avgTtrHours.toStringAsFixed(1)}h',
+              icon: Icons.timer,
+              color: Colors.green,
+              subtitle: '7 days',
+            ),
+          ],
+        ),
+        
+        const SizedBox(height: AppTheme.spacingL),
+        
+        // Contract expiry alerts (if any expiring contracts)
+        if (kpis.expiringContracts > 0) ...[
+          _buildExpiryAlertCard(kpis.expiringContracts),
+          const SizedBox(height: AppTheme.spacingM),
+        ],
+        
+        // PM counters
+        _buildPMCountersGrid(kpis),
+      ],
+    );
+  }
+
+  Widget _buildExpiryAlertCard(int expiringCount) {
+    return Card(
+      child: InkWell(
+        onTap: () => context.go('/contracts'),
+        borderRadius: BorderRadius.circular(AppTheme.radiusM),
+        child: Container(
+          padding: const EdgeInsets.all(AppTheme.spacingL),
+          decoration: BoxDecoration(
+            color: Colors.orange.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(AppTheme.radiusM),
+            border: Border.all(
+              color: Colors.orange.withOpacity(0.3),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppTheme.spacingM),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.warning,
+                  color: Colors.orange,
+                  size: 24,
+                ),
+              ),
+              
+              const SizedBox(width: AppTheme.spacingM),
+              
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Contract Expiry Alert',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.orange,
+                      ),
+                    ),
+                    const SizedBox(height: AppTheme.spacingXS),
+                    Text(
+                      '$expiringCount contract${expiringCount > 1 ? 's' : ''} expiring within 30 days',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.orange,
+                size: 16,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPMCountersGrid(RequestKPIs kpis) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
+      crossAxisCount: 3,
       crossAxisSpacing: AppTheme.spacingM,
       mainAxisSpacing: AppTheme.spacingM,
-      childAspectRatio: 1.2,
+      childAspectRatio: 1.0,
       children: [
-        _buildKpiCard(
-          title: 'Open Requests',
-          value: kpis.openRequests.toString(),
-          icon: Icons.pending_actions,
+        _buildPMCard(
+          title: 'PM Upcoming',
+          value: kpis.pmUpcoming.toString(),
+          icon: Icons.schedule,
           color: Colors.blue,
-          onTap: () => context.go('/requests'),
+          onTap: () => context.go('/pm'),
         ),
-        _buildKpiCard(
-          title: 'Overdue',
-          value: kpis.overdueRequests.toString(),
-          icon: Icons.warning,
-          color: Colors.red,
-          onTap: () => context.go('/requests'),
-        ),
-        _buildKpiCard(
+        _buildPMCard(
           title: 'Due Today',
-          value: kpis.dueTodayRequests.toString(),
+          value: kpis.pmDueToday.toString(),
           icon: Icons.today,
           color: Colors.orange,
-          onTap: () => context.go('/requests'),
+          onTap: () => context.go('/pm'),
+          isUrgent: kpis.pmDueToday > 0,
         ),
-        _buildKpiCard(
-          title: 'Avg. TTR',
-          value: '${kpis.avgTtrHours.toStringAsFixed(1)}h',
-          icon: Icons.timer,
-          color: Colors.green,
-          subtitle: '7 days',
+        _buildPMCard(
+          title: 'Overdue',
+          value: kpis.pmOverdue.toString(),
+          icon: Icons.error,
+          color: Colors.red,
+          onTap: () => context.go('/pm'),
+          isUrgent: kpis.pmOverdue > 0,
         ),
       ],
+    );
+  }
+
+  Widget _buildPMCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    required Color color,
+    VoidCallback? onTap,
+    bool isUrgent = false,
+  }) {
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.radiusM),
+        child: Container(
+          padding: const EdgeInsets.all(AppTheme.spacingM),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radiusM),
+            border: isUrgent 
+                ? Border.all(color: color, width: 2)
+                : null,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppTheme.spacingS),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 20,
+                ),
+              ),
+              
+              const SizedBox(height: AppTheme.spacingS),
+              
+              Text(
+                value,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isUrgent ? color : null,
+                ),
+              ),
+              
+              const SizedBox(height: AppTheme.spacingXS),
+              
+              Text(
+                title,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
