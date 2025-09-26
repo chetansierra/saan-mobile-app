@@ -21,6 +21,7 @@ class AuthService extends ChangeNotifier {
   }
 
   final AuthRepository _repository = AuthRepository.instance;
+  final OnboardingRepository _onboardingRepository = OnboardingRepository.instance;
   
   AuthState _state = const AuthState();
   StreamSubscription<AuthState>? _authSubscription;
