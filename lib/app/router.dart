@@ -116,15 +116,34 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
 
-      // Contracts routes (placeholder)
+      // Contracts routes
       GoRoute(
         path: '/contracts',
-        name: 'contracts',
-        builder: (context, state) => const _PlaceholderPage(
-          title: 'Contracts',
-          message: 'Contracts module will be implemented in Round 5',
-          showAppBar: true,
-        ),
+        builder: (context, state) => const ContractListPage(),
+      ),
+      GoRoute(
+        path: '/contracts/create',
+        builder: (context, state) => const CreateContractPage(),
+      ),
+      GoRoute(
+        path: '/contracts/:contractId',
+        builder: (context, state) {
+          final contractId = state.pathParameters['contractId']!;
+          return ContractDetailPage(contractId: contractId);
+        },
+      ),
+
+      // PM routes
+      GoRoute(
+        path: '/pm',
+        builder: (context, state) => const PMSchedulePage(),
+      ),
+      GoRoute(
+        path: '/pm/:pmVisitId',
+        builder: (context, state) {
+          final pmVisitId = state.pathParameters['pmVisitId']!;
+          return PMVisitDetailPage(pmVisitId: pmVisitId);
+        },
       ),
 
       // Profile routes (placeholder)
