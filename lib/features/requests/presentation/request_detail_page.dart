@@ -307,7 +307,121 @@ class _RequestDetailPageState extends ConsumerState<RequestDetailPage> {
     );
   }
 
-  Widget _buildBody(AuthService authService) {
+  /// Build sticky header with Request ID, Status chip, and Priority chip
+  Widget _buildStickyHeader(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + AppTheme.spacingM,
+        left: AppTheme.spacingL,
+        right: AppTheme.spacingL,
+        bottom: AppTheme.spacingM,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Back button
+          IconButton(
+            onPressed: () => context.go('/requests'),
+            icon: const Icon(Icons.arrow_back),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+          ),
+          
+          const SizedBox(width: AppTheme.spacingM),
+          
+          // Request ID
+          Text(
+            'Request #${widget.requestId.substring(0, 8)}',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          
+          const Spacer(),
+          
+          // Status and Priority chips
+          if (_request != null) ...[
+            // Status chip
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.spacingS,
+                vertical: AppTheme.spacingXS,
+              ),
+              decoration: BoxDecoration(
+                color: Color(int.parse('0xFF${_request!.status.colorHex.substring(1)}')).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(AppTheme.radiusS),
+                border: Border.all(
+                  color: Color(int.parse('0xFF${_request!.status.colorHex.substring(1)}')).withOpacity(0.3),
+                ),
+              ),
+              child: Text(
+                _request!.status.displayName.toUpperCase(),
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Color(int.parse('0xFF${_request!.status.colorHex.substring(1)}')),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            
+            const SizedBox(width: AppTheme.spacingS),
+            
+            // Priority chip
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.spacingS,
+                vertical: AppTheme.spacingXS,
+              ),
+              decoration: BoxDecoration(
+                color: _request!.priority == RequestPriority.critical 
+                    ? Colors.red.withOpacity(0.1)
+                    : Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(AppTheme.radiusS),
+                border: Border.all(
+                  color: _request!.priority == RequestPriority.critical 
+                      ? Colors.red.withOpacity(0.3)
+                      : Colors.blue.withOpacity(0.3),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_request!.priority == RequestPriority.critical) ...[
+                    Icon(
+                      Icons.priority_high,
+                      size: 14,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(width: AppTheme.spacingXS),
+                  ],
+                  Text(
+                    _request!.priority.displayName.toUpperCase(),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: _request!.priority == RequestPriority.critical 
+                          ? Colors.red
+                          : Colors.blue,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Build main content area
+  Widget _buildMainContent(AuthService authService) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -322,54 +436,216 @@ class _RequestDetailPageState extends ConsumerState<RequestDetailPage> {
 
     return RefreshIndicator(
       onRefresh: _onRefresh,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppTheme.spacingL),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        children: [
+          // Top row: SLA Badge and Assignee Picker
+          _buildTopRow(authService),
+          
+          // Scrollable sections
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppTheme.spacingL),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 1) Details Section
+                  _buildDetailsSection(),
+                  
+                  const SizedBox(height: AppTheme.spacingL),
+                  
+                  // 2) Attachments Section
+                  if (_request!.mediaUrls.isNotEmpty) ...[
+                    _buildAttachmentsSection(),
+                    const SizedBox(height: AppTheme.spacingL),
+                  ],
+                  
+                  // 3) Timeline Section
+                  _buildTimelineSection(),
+                  
+                  const SizedBox(height: AppTheme.spacingL),
+                  
+                  // 4) Notes Section (Optional)
+                  _buildNotesSection(),
+                  
+                  // Add bottom padding for floating bottom bar
+                  if (authService.isAdmin)
+                    const SizedBox(height: 80),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build top row with SLA Badge and Assignee Picker
+  Widget _buildTopRow(AuthService authService) {
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spacingL),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        border: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).dividerColor,
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          // SLA Badge
+          if (_request!.slaDueAt != null) ...[
+            Expanded(
+              child: SLABadge(
+                slaDueAt: _request!.slaDueAt,
+                showBreachAlert: SlaUtils.isOverdue(_request!.slaDueAt),
+                size: SLABadgeSize.large,
+              ),
+            ),
+          ] else ...[
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.spacingM,
+                  vertical: AppTheme.spacingS,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusS),
+                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.schedule, color: Colors.blue, size: 16),
+                    const SizedBox(width: AppTheme.spacingXS),
+                    Text(
+                      'Standard Priority',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          
+          const SizedBox(width: AppTheme.spacingL),
+          
+          // Assignee Picker (for admins only)
+          if (authService.isAdmin) ...[
+            Expanded(
+              child: _buildCompactAssigneePicker(),
+            ),
+          ] else if (_request!.assignedEngineerName != null) ...[
+            // Show assigned engineer for requesters
+            Expanded(
+              child: _buildAssignedEngineerDisplay(),
+            ),
+          ] else ...[
+            const Expanded(child: SizedBox.shrink()),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Build compact assignee picker for top row
+  Widget _buildCompactAssigneePicker() {
+    final hasAssignee = _request!.assignedEngineerName != null && _request!.assignedEngineerName!.isNotEmpty;
+    
+    return InkWell(
+      onTap: _showAssigneePickerBottomSheet,
+      borderRadius: BorderRadius.circular(AppTheme.radiusS),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.spacingM,
+          vertical: AppTheme.spacingS,
+        ),
+        decoration: BoxDecoration(
+          color: hasAssignee
+              ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+              : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(AppTheme.radiusS),
+          border: Border.all(
+            color: hasAssignee
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.3)
+                : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Header card with priority and SLA
-            _buildHeaderCard(),
-            
-            const SizedBox(height: AppTheme.spacingL),
-            
-            // Status timeline
-            _buildStatusSection(),
-            
-            const SizedBox(height: AppTheme.spacingL),
-            
-            // Request details
-            _buildDetailsSection(),
-            
-            const SizedBox(height: AppTheme.spacingL),
-            
-            // Assignee section (admin only)
-            if (authService.isAdmin) ...[
-              AssigneePicker(
-                availableAssignees: _availableAssignees,
-                currentAssignee: _request!.assignedEngineerName,
-                onAssigneeSelected: _assignEngineer,
-                isLoading: _isLoadingAssignees,
+            Icon(
+              hasAssignee ? Icons.person : Icons.person_add,
+              color: hasAssignee
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
+              size: 16,
+            ),
+            const SizedBox(width: AppTheme.spacingXS),
+            Expanded(
+              child: Text(
+                hasAssignee ? _request!.assignedEngineerName! : 'Assign Engineer',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: hasAssignee
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
-              
-              const SizedBox(height: AppTheme.spacingL),
-            ],
-            
-            // Attachments
-            if (_request!.mediaUrls.isNotEmpty) ...[
-              AttachmentGallery(
-                attachmentPaths: _request!.mediaUrls,
-                isReadOnly: true,
-              ),
-              
-              const SizedBox(height: AppTheme.spacingL),
-            ],
-            
-            // Admin actions
-            if (authService.isAdmin) ...[
-              _buildActionSection(),
-            ],
+            ),
+            Icon(
+              Icons.arrow_drop_down,
+              color: hasAssignee
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
+              size: 16,
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Build assigned engineer display for requesters
+  Widget _buildAssignedEngineerDisplay() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacingM,
+        vertical: AppTheme.spacingS,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(AppTheme.radiusS),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.person,
+            color: Theme.of(context).colorScheme.primary,
+            size: 16,
+          ),
+          const SizedBox(width: AppTheme.spacingXS),
+          Expanded(
+            child: Text(
+              _request!.assignedEngineerName!,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       ),
     );
   }
