@@ -183,6 +183,18 @@ class RequestsService extends ChangeNotifier {
         debugPrint('⚠️ SLA derivation failed, using defaults: $e');
       }
 
+      // Calculate SLA due date
+      final now = DateTime.now();
+      DateTime? slaDueAt;
+      
+      if (derivedSla != null) {
+        // Use contract-derived SLA
+        slaDueAt = now.add(derivedSla);
+      } else if (priority.hasSla) {
+        // Use default SLA from priority
+        slaDueAt = now.add(Duration(hours: priority.slaHours));
+      }
+
       final request = ServiceRequest(
         tenantId: tenantId,
         facilityId: facilityId,
@@ -191,7 +203,8 @@ class RequestsService extends ChangeNotifier {
         description: description,
         preferredWindow: preferredWindow,
         mediaUrls: mediaUrls ?? [],
-        customSla: derivedSla,
+        slaDueAt: slaDueAt,
+        createdAt: now,
       );
 
       final createdRequest = await _repository.createRequest(
