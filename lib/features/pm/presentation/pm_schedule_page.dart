@@ -117,8 +117,9 @@ class _PMSchedulePageState extends ConsumerState<PMSchedulePage>
           ],
         ),
       ),
-      body: _buildBody(),
-      floatingActionButton: _buildFloatingActionButton(),
+        body: _buildBody(),
+        floatingActionButton: _buildFloatingActionButton(),
+      ),
     );
   }
 
