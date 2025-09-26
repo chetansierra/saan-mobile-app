@@ -422,19 +422,31 @@ class RequestsRepository {
   }
 }
 
-/// KPI data model
+/// KPI data model with contracts and PM metrics
 class RequestKPIs extends Equatable {
   const RequestKPIs({
     required this.openRequests,
     required this.overdueRequests,
     required this.dueTodayRequests,
     required this.avgTtrHours,
+    this.expiringContracts = 0,
+    this.pmUpcoming = 0,
+    this.pmDueToday = 0,
+    this.pmOverdue = 0,
   });
 
   final int openRequests;
   final int overdueRequests;
   final int dueTodayRequests;
   final double avgTtrHours;
+  
+  // Contract metrics
+  final int expiringContracts;
+  
+  // PM metrics
+  final int pmUpcoming;
+  final int pmDueToday;
+  final int pmOverdue;
 
   @override
   List<Object?> get props => [
@@ -442,6 +454,10 @@ class RequestKPIs extends Equatable {
         overdueRequests,
         dueTodayRequests,
         avgTtrHours,
+        expiringContracts,
+        pmUpcoming,
+        pmDueToday,
+        pmOverdue,
       ];
 
   @override
