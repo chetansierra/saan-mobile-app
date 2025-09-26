@@ -392,6 +392,33 @@ class RequestsRepository {
       throw SupabaseException('Failed to fetch recent requests: ${e.toString()}');
     }
   }
+
+  /// Get available assignees (admin users) for the tenant
+  Future<List<UserProfile>> getAvailableAssignees(String tenantId) async {
+    try {
+      debugPrint('👥 Fetching available assignees for tenant: $tenantId');
+      
+      final response = await _client
+          .from(SupabaseTables.profiles)
+          .select('*')
+          .eq('tenant_id', tenantId)
+          .eq('role', 'admin')
+          .order('name', ascending: true);
+
+      final assignees = (response as List).map((json) {
+        return UserProfile.fromJson(json as Map<String, dynamic>);
+      }).toList();
+
+      debugPrint('✅ Fetched ${assignees.length} available assignees');
+      return assignees;
+    } on PostgrestException catch (e) {
+      debugPrint('❌ Failed to fetch assignees: ${e.message}');
+      throw e.toSupabaseException();
+    } catch (e) {
+      debugPrint('❌ Unexpected error fetching assignees: $e');
+      throw SupabaseException('Failed to fetch assignees: ${e.toString()}');
+    }
+  }
 }
 
 /// KPI data model
