@@ -4,9 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../app/theme.dart';
+import '../../../core/ui/connection_indicator.dart';
 import '../../auth/domain/auth_service.dart';
 import '../domain/pm_service.dart';
 import '../domain/pm_visit.dart';
+import '../realtime/pm_realtime.dart';
 
 /// PM Schedule page showing upcoming visits with calendar/list view
 class PMSchedulePage extends ConsumerStatefulWidget {
