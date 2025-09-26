@@ -107,6 +107,7 @@ class _RequestListPageState extends ConsumerState<RequestListPage> {
         label: const Text('New Request'),
         icon: const Icon(Icons.add),
       ),
+      ),
     );
   }
 
