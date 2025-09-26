@@ -86,20 +86,29 @@ class _RequestListPageState extends ConsumerState<RequestListPage> {
             tooltip: 'Filter requests',
           ),
         ],
+        ),
+      ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // Search bar
-          _buildSearchBar(),
-          
-          // Filter chips
-          if (requestsState.filters.hasActiveFilters)
-            _buildFilterChips(requestsState.filters),
-          
-          // Request list
-          Expanded(
-            child: _buildRequestList(requestsState),
+          Column(
+            children: [
+              // Search bar
+              _buildSearchBar(),
+              
+              // Filter chips
+              if (requestsState.filters.hasActiveFilters)
+                _buildFilterChips(requestsState.filters),
+              
+              // Request list
+              Expanded(
+                child: _buildRequestList(requestsState),
+              ),
+            ],
           ),
+          
+          // Floating connection indicator
+          const FloatingConnectionIndicator(),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
