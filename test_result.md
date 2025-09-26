@@ -106,7 +106,7 @@
 
 ## backend:
   - task: "Add getAvailableAssignees method to RequestsRepository"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "lib/features/requests/data/requests_repository.dart"
     stuck_count: 0
@@ -115,10 +115,10 @@
     status_history:
         - working: "NA"
         - agent: "main"
-        - comment: "Method is called in request_detail_page.dart but doesn't exist in repository"
+        - comment: "Added getAvailableAssignees method to query profiles table for admin users in tenant"
 
   - task: "Add getAvailableAssignees method to RequestsService"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "lib/features/requests/domain/requests_service.dart"
     stuck_count: 0
@@ -127,19 +127,19 @@
     status_history:
         - working: "NA"
         - agent: "main"
-        - comment: "Method is called in request_detail_page.dart but doesn't exist in service"
+        - comment: "Added getAvailableAssignees method that calls repository method with tenant validation"
 
   - task: "Add signed URL generation for attachments to StorageHelper"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "lib/core/storage/storage_helper.dart"
     stuck_count: 0
-    priority: "high"
-    needs_retesting: true
+    priority: "medium"
+    needs_retesting: false
     status_history:
         - working: "NA"
         - agent: "main"
-        - comment: "Method is called in attachment_gallery.dart but need to verify if it exists"
+        - comment: "StorageHelper already has getSignedUrl method implemented - no changes needed"
 
 ## frontend:
   - task: "Refactor request detail page to match exact layout specification"
