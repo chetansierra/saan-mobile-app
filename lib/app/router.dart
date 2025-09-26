@@ -85,35 +85,35 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const OnboardingReviewPage(),
       ),
 
-      // Main app routes (placeholder for future rounds)
+      // Main app routes
       GoRoute(
         path: '/home',
         name: 'home',
-        builder: (context, state) => const _PlaceholderPage(
-          title: 'Dashboard',
-          message: 'Welcome to CUERON SAAN! Your setup is complete.',
-          showAppBar: true,
-        ),
+        builder: (context, state) => const HomePage(),
       ),
 
-      // Requests routes (placeholder)
+      // Requests routes
       GoRoute(
         path: '/requests',
         name: 'requests',
-        builder: (context, state) => const _PlaceholderPage(
-          title: 'Requests',
-          message: 'Requests module will be implemented in Round 4',
-          showAppBar: true,
-        ),
+        builder: (context, state) => const RequestListPage(),
       ),
       GoRoute(
         path: '/requests/new',
         name: 'newRequest',
-        builder: (context, state) => const _PlaceholderPage(
-          title: 'New Request',
-          message: 'Request creation will be implemented in Round 4',
-          showAppBar: true,
-        ),
+        builder: (context, state) => const CreateRequestPage(),
+      ),
+      GoRoute(
+        path: '/requests/:id',
+        name: 'requestDetail',
+        builder: (context, state) {
+          final requestId = state.pathParameters['id']!;
+          return _PlaceholderPage(
+            title: 'Request Details',
+            message: 'Request detail page for ID: $requestId\nWill be implemented with full details view.',
+            showAppBar: true,
+          );
+        },
       ),
 
       // Contracts routes (placeholder)
