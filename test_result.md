@@ -163,6 +163,42 @@
         - agent: "main"
         - comment: "Completely restructured layout to match specification: sticky header with ID/status/priority chips, top row with SLA badge and assignee picker, scrollable sections (details, attachments, timeline, notes), and sticky bottom bar for admins"
 
+  - task: "Implement Requests Realtime bindings with selective updates and notifications"
+    implemented: true
+    working: "NA"
+    file: "lib/features/requests/realtime/requests_realtime.dart"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Created RequestsRealtimeManager with tenant-scoped subscriptions, 300ms debouncing, selective UI updates, and priority notifications (on_site status, SLA breach/warning ≤15m, new critical requests, assignee changes). Integrated into request_list_page and request_detail_page with realtime hooks."
+
+  - task: "Implement PM Realtime bindings with completion notifications"  
+    implemented: true
+    working: "NA"
+    file: "lib/features/pm/realtime/pm_realtime.dart"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Created PMRealtimeManager for PM visit updates with selective refresh, completion notifications, and overdue alerts. Integrated into pm_schedule_page with realtime hooks."
+
+  - task: "Add Connection Indicators and Realtime UI Integration"
+    implemented: true
+    working: "NA"
+    file: "lib/core/ui/connection_indicator.dart"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Added FloatingConnectionIndicator to request_list_page, request_detail_page, and pm_schedule_page. Shows subtle indicators when disconnected with retry functionality."
+
   - task: "Enhance StatusTimeline widget to show timestamps and notes"
     implemented: false
     working: "NA"
