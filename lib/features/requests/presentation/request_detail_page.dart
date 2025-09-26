@@ -14,6 +14,7 @@ import 'widgets/sla_badge.dart';
 import 'widgets/status_timeline.dart';
 
 /// Request detail page showing full request information and actions
+/// Layout: Sticky Header | Top Row (SLA + Assignee) | Scrollable Sections | Sticky Bottom Bar
 class RequestDetailPage extends ConsumerStatefulWidget {
   const RequestDetailPage({
     super.key,
