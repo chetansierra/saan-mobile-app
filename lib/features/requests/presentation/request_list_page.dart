@@ -35,6 +35,10 @@ class _RequestListPageState extends ConsumerState<RequestListPage> {
     _scrollController.addListener(_onScroll);
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Track screen view
+      final analytics = ref.read(analyticsProvider);
+      AnalyticsHelper.trackNavigation(analytics, 'requests_list');
+      
       ref.read(requestsServiceProvider).initialize();
     });
   }
