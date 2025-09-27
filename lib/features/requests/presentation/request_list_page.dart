@@ -74,6 +74,11 @@ class _RequestListPageState extends ConsumerState<RequestListPage> {
   }
 
   void _showFilters() {
+    final analytics = ref.read(analyticsProvider);
+    AnalyticsHelper.trackAction(analytics, 'open_filter_sheet', context: {
+      'screen': 'requests_list',
+    });
+    
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
