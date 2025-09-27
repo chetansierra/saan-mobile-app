@@ -637,6 +637,73 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
+  Widget _buildUnpaidInvoicesCard(int unpaidCount, double outstandingAmount) {
+    return Card(
+      child: InkWell(
+        onTap: () => context.go('/billing'),
+        borderRadius: BorderRadius.circular(AppTheme.radiusM),
+        child: Container(
+          padding: const EdgeInsets.all(AppTheme.spacingL),
+          decoration: BoxDecoration(
+            color: Colors.purple.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(AppTheme.radiusM),
+            border: Border.all(
+              color: Colors.purple.withOpacity(0.3),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppTheme.spacingM),
+                decoration: BoxDecoration(
+                  color: Colors.purple.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.receipt_long,
+                  color: Colors.purple,
+                  size: 24,
+                ),
+              ),
+              
+              const SizedBox(width: AppTheme.spacingM),
+              
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Unpaid Invoices',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.purple,
+                      ),
+                    ),
+                    
+                    const SizedBox(height: AppTheme.spacingXS),
+                    
+                    Text(
+                      '$unpaidCount invoices • ₹${outstandingAmount.toStringAsFixed(2)} outstanding',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.purple[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.purple,
+                size: 16,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildErrorCard(String error) {
     return Card(
       child: Padding(
