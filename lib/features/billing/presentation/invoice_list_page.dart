@@ -78,7 +78,15 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage> {
     final state = billingService.state;
     
     if (state.hasMore && !state.isLoading) {
-      billingService.loadInvoices(page: state.currentPage + 1);
+      // Track pagination
+      final analytics = ref.read(analyticsProvider);
+      analytics.trackEvent('paginate_next', {
+        'from_page': state.currentPage,
+        'item_count': state.invoices.length,
+        'timestamp': DateTime.now().toIso8601String(),
+      });
+
+      billingService.loadMore();
     }
   }
 
