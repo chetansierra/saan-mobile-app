@@ -326,112 +326,27 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage> {
     context.go('/billing/${invoice.id}');
   }
 
-  Widget _buildInvoiceCard(Invoice invoice) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
-      child: InkWell(
-        onTap: () => context.go('/billing/${invoice.id}'),
-        borderRadius: BorderRadius.circular(AppTheme.cardBorderRadius),
-        child: Padding(
-          padding: const EdgeInsets.all(AppTheme.spacingM),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header row
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          invoice.invoiceNumber,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          invoice.customerInfo.name,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  _buildStatusBadge(invoice.status),
-                ],
-              ),
-              
-              const SizedBox(height: AppTheme.spacingM),
-              
-              // Amount and dates row
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Amount',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        Text(
-                          '₹${invoice.total.toStringAsFixed(2)}',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: invoice.isOverdue ? Colors.red : null,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Due Date',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        Text(
-                          DateFormat('MMM dd, yyyy').format(invoice.dueDate),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: invoice.isOverdue ? Colors.red : null,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              
-              // Overdue indicator
-              if (invoice.isOverdue)
-                Padding(
-                  padding: const EdgeInsets.only(top: AppTheme.spacingS),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.warning, color: Colors.red, size: 16),
-                      const SizedBox(width: AppTheme.spacingXS),
-                      Text(
-                        'Overdue by ${-invoice.daysUntilDue} days',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
+  Widget _buildStatusBadge(InvoiceStatus status) {
+    final color = Color(int.parse('0xFF${status.colorHex.substring(1)}'));
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacingS,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Text(
+        status.displayName,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
         ),
+        semanticsLabel: 'Invoice status: ${status.displayName}',
       ),
     );
   }
