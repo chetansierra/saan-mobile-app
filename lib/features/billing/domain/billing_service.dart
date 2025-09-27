@@ -589,6 +589,7 @@ class BillingState {
     this.filters = const InvoiceFilters(),
     this.isLoading = false,
     this.error,
+    this.cursor,
   });
 
   final List<Invoice> invoices;
@@ -598,6 +599,7 @@ class BillingState {
   final InvoiceFilters filters;
   final bool isLoading;
   final String? error;
+  final InvoiceCursor? cursor;
 
   /// Create copy with updated fields
   BillingState copyWith({
@@ -608,6 +610,7 @@ class BillingState {
     InvoiceFilters? filters,
     bool? isLoading,
     String? error,
+    InvoiceCursor? cursor,
   }) {
     return BillingState(
       invoices: invoices ?? this.invoices,
@@ -617,6 +620,7 @@ class BillingState {
       filters: filters ?? this.filters,
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      cursor: cursor,
     );
   }
 }
