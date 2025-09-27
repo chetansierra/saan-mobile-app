@@ -58,9 +58,18 @@ class _RequestListPageState extends ConsumerState<RequestListPage> {
   }
 
   void _onSearchChanged(String query) {
+    // Debounce search to avoid excessive API calls
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 500), () {
-      ref.read(requestsServiceProvider).searchRequests(query);
+      final analytics = ref.read(analyticsProvider);
+      AnalyticsHelper.trackAction(analytics, 'search_requests', context: {
+        'query_length': query.length,
+        'has_query': query.isNotEmpty,
+      });
+      
+      final currentFilters = ref.read(requestsServiceProvider).state.filters;
+      final newFilters = currentFilters.copyWith(searchQuery: query.isEmpty ? null : query);
+      ref.read(requestsServiceProvider).applyFilters(newFilters);
     });
   }
 
