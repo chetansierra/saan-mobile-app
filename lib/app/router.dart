@@ -152,6 +152,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
 
+      // Billing routes
+      GoRoute(
+        path: '/billing',
+        name: 'billing',
+        builder: (context, state) => const InvoiceListPage(),
+      ),
+      GoRoute(
+        path: '/billing/:invoiceId',
+        name: 'invoiceDetail',
+        builder: (context, state) {
+          final invoiceId = state.pathParameters['invoiceId']!;
+          return InvoiceDetailPage(invoiceId: invoiceId);
+        },
+      ),
+
       // Profile routes (placeholder)
       GoRoute(
         path: '/profile',
