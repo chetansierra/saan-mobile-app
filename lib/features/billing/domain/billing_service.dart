@@ -267,22 +267,25 @@ class BillingService extends ChangeNotifier {
     }
   }
 
-  /// Load invoices with pagination and filters
+  /// Load invoices with cursor-based pagination and filters
   Future<void> loadInvoices({
     int page = 1,
     int pageSize = 20,
     InvoiceFilters? filters,
     bool refresh = false,
+    InvoiceCursor? cursor,
   }) async {
+    final currentToken = _cancelToken;
+    
     try {
       final tenantId = _tenantId;
       if (tenantId == null) {
         throw Exception('No tenant context');
       }
 
-      debugPrint('💰 Loading invoices: page=$page, refresh=$refresh');
+      debugPrint('💰 Loading invoices: page=$page, refresh=$refresh, cursor=${cursor != null}');
 
-      if (refresh || page == 1) {
+      if (refresh || page == 1 || cursor == null) {
         _updateState(_state.copyWith(isLoading: true, error: null));
       }
 
@@ -291,10 +294,17 @@ class BillingService extends ChangeNotifier {
         page: page,
         pageSize: pageSize,
         filters: filters,
+        cursor: cursor,
       );
 
+      // Check if request was cancelled
+      if (currentToken != _cancelToken) {
+        debugPrint('🚫 Request cancelled, ignoring result');
+        return;
+      }
+
       List<Invoice> updatedInvoices;
-      if (refresh || page == 1) {
+      if (refresh || page == 1 || cursor == null) {
         updatedInvoices = result.invoices;
       } else {
         updatedInvoices = List.from(_state.invoices)..addAll(result.invoices);
@@ -306,11 +316,18 @@ class BillingService extends ChangeNotifier {
         currentPage: page,
         hasMore: result.hasMore,
         filters: filters ?? _state.filters,
+        cursor: result.cursor,
         isLoading: false,
       ));
 
       debugPrint('✅ Loaded ${result.invoices.length} invoices');
     } catch (e) {
+      // Check if request was cancelled
+      if (currentToken != _cancelToken) {
+        debugPrint('🚫 Request cancelled during error handling');
+        return;
+      }
+      
       debugPrint('❌ Failed to load invoices: $e');
       _updateState(_state.copyWith(
         isLoading: false,
