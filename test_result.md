@@ -105,50 +105,125 @@
 ## user_problem_statement: "Test the Round 7 Billing (Invoices) + PhonePe Launcher implementation for Flutter facility management app. Focus on testing: Domain Models (Invoice, InvoiceLine, PaymentAttempt), Repository Testing (BillingRepository CRUD operations), Service Layer Testing (BillingService business logic), Integration Testing (KPI integration, PhonePe integration), Business Logic Validation (invoice generation, status transitions, totals calculation), and ensure proper tenant isolation and error handling."
 
 ## backend:
-  - task: "Add getAvailableAssignees method to RequestsRepository"
+  - task: "Invoice Domain Model Implementation"
     implemented: true
     working: true
-    file: "lib/features/requests/data/requests_repository.dart"
+    file: "lib/features/billing/domain/invoice.dart"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
         - working: "NA"
         - agent: "main"
-        - comment: "Added getAvailableAssignees method to query profiles table for admin users in tenant"
+        - comment: "Implemented Invoice model with status transitions, business logic, customer info, and totals calculation"
         - working: true
         - agent: "testing"
-        - comment: "PASSED: Method properly implemented with tenant filtering (.eq('tenant_id', tenantId)), admin role filtering (.eq('role', 'admin')), proper error handling (PostgrestException catch), debug logging, and name ordering. All required patterns validated successfully."
+        - comment: "PASSED: Invoice model properly implemented with complete business logic (38 validated patterns). Status transitions (draft→sent→pending→paid/failed/refunded), overdue logic, customer info validation, and totals calculation all working correctly."
 
-  - task: "Add getAvailableAssignees method to RequestsService"
+  - task: "InvoiceLine Domain Model Implementation"
     implemented: true
     working: true
-    file: "lib/features/requests/domain/requests_service.dart"
+    file: "lib/features/billing/domain/invoice_line.dart"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
         - working: "NA"
         - agent: "main"
-        - comment: "Added getAvailableAssignees method that calls repository method with tenant validation"
+        - comment: "Implemented InvoiceLine model with tax calculations, line item types, templates, and validation"
         - working: true
         - agent: "testing"
-        - comment: "PASSED: Method properly implemented with correct signature (Future<List<UserProfile>> getAvailableAssignees()), tenant validation (if tenantId == null), repository call (_repository.getAvailableAssignees(tenantId)), proper error handling and debug logging. All required patterns validated successfully."
+        - comment: "PASSED: InvoiceLine model properly implemented with accurate tax calculations (29 validated patterns). Tax calculation logic (lineTotal * taxRate), decimal precision (toStringAsFixed(2)), and validation rules all working correctly."
 
-  - task: "Add signed URL generation for attachments to StorageHelper"
+  - task: "PaymentAttempt Domain Model & PhonePe Integration"
     implemented: true
     working: true
-    file: "lib/core/storage/storage_helper.dart"
+    file: "lib/features/billing/domain/payment_attempt.dart"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Implemented PaymentAttempt model with PhonePe utilities, deeplink generation, and reference ID management"
+        - working: true
+        - agent: "testing"
+        - comment: "PASSED: PaymentAttempt model and PhonePe integration properly implemented (38 validated patterns). PhonePe deeplink generation, UPI intents, reference ID generation, and payment status tracking all working correctly."
+
+  - task: "BillingRepository CRUD Operations"
+    implemented: true
+    working: false
+    file: "lib/features/billing/data/billing_repository.dart"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Implemented BillingRepository with comprehensive CRUD operations, transaction integrity, and KPI calculations"
+        - working: false
+        - agent: "testing"
+        - comment: "FAILED: Missing repository patterns (4/37 failed): create_line_items transaction handling, decimal_rounding in some calculations, unpaid_invoices and overdue_invoices KPI query patterns. Core CRUD operations working but needs refinement in transaction integrity and KPI calculations."
+
+  - task: "BillingService Business Logic & Admin Operations"
+    implemented: true
+    working: false
+    file: "lib/features/billing/domain/billing_service.dart"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Implemented BillingService with invoice generation, status transitions, PhonePe integration, and admin authorization"
+        - working: false
+        - agent: "testing"
+        - comment: "FAILED: Missing service patterns (4/48 failed): send_admin_only, paid_admin_only, refund_admin_only, delete_admin_only authorization checks. Core business logic working but admin authorization patterns need strengthening. Business logic scoring 0/6 for priority-based pricing patterns."
+
+  - task: "Supabase Table Integration & Database Schema"
+    implemented: true
+    working: true
+    file: "lib/core/supabase/client.dart"
     stuck_count: 0
     priority: "medium"
     needs_retesting: false
     status_history:
         - working: "NA"
         - agent: "main"
-        - comment: "StorageHelper already has getSignedUrl method implemented - no changes needed"
+        - comment: "Configured Supabase table references for billing (invoices, invoice_lines, payment_attempts)"
         - working: true
         - agent: "testing"
-        - comment: "PASSED: getSignedUrl method properly implemented with correct signature (Future<String> getSignedUrl), path parameter, expires parameter (default 3600s), SupabaseService.getSignedUrl call, attachments bucket usage, proper error handling and debug logging. Batch getSignedUrls method also available."
+        - comment: "PASSED: Supabase integration properly configured with billing table references (22 validated patterns). Table constants, client configuration, tenant isolation, and storage integration all working correctly."
+
+  - task: "KPI Integration & Billing Metrics"
+    implemented: true
+    working: false
+    file: "lib/features/billing/data/billing_repository.dart"
+    stuck_count: 1
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Implemented billing KPIs for dashboard (unpaid invoices, overdue invoices, outstanding amount, monthly revenue)"
+        - working: false
+        - agent: "testing"
+        - comment: "FAILED: Missing KPI integration patterns (2/15 failed): unpaid_count_query and overdue_count_query patterns. Service integration working but repository query patterns need refinement for proper KPI calculations."
+
+  - task: "Presentation Layer & UI Integration"
+    implemented: true
+    working: true
+    file: "lib/features/billing/presentation/"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Implemented billing UI components (invoice list, detail page, payment collection sheet with PhonePe launcher)"
+        - working: true
+        - agent: "testing"
+        - comment: "PASSED: Presentation layer fully implemented with PhonePe integration (100% implementation score). All UI components found: invoice_list_page.dart, invoice_detail_page.dart, collect_payment_sheet.dart with PhonePe button and manual status updates."
 
 ## frontend:
   - task: "Refactor request detail page to match exact layout specification"
