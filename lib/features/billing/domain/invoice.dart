@@ -447,6 +447,34 @@ class DateRange extends Equatable {
 }
 
 /// Paginated invoice list response
+/// Cursor for efficient pagination
+class InvoiceCursor extends Equatable {
+  const InvoiceCursor({
+    required this.issueDate,
+    required this.id,
+  });
+
+  final DateTime issueDate;
+  final String id;
+
+  /// Check if cursor is valid for pagination
+  bool get isValid => id.isNotEmpty;
+
+  /// Create cursor from invoice
+  factory InvoiceCursor.fromInvoice(Invoice invoice) {
+    return InvoiceCursor(
+      issueDate: invoice.issueDate,
+      id: invoice.id!,
+    );
+  }
+
+  @override
+  List<Object?> get props => [issueDate, id];
+
+  @override
+  String toString() => 'InvoiceCursor(issueDate: $issueDate, id: $id)';
+}
+
 class PaginatedInvoices extends Equatable {
   const PaginatedInvoices({
     required this.invoices,
@@ -454,6 +482,7 @@ class PaginatedInvoices extends Equatable {
     required this.page,
     required this.pageSize,
     required this.hasMore,
+    this.cursor,
   });
 
   final List<Invoice> invoices;
@@ -461,9 +490,10 @@ class PaginatedInvoices extends Equatable {
   final int page;
   final int pageSize;
   final bool hasMore;
+  final InvoiceCursor? cursor;
 
   @override
-  List<Object?> get props => [invoices, total, page, pageSize, hasMore];
+  List<Object?> get props => [invoices, total, page, pageSize, hasMore, cursor];
 }
 
 // Forward declaration - defined in invoice_line.dart
