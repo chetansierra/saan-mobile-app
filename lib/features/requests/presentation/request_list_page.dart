@@ -215,36 +215,120 @@ class _RequestListPageState extends ConsumerState<RequestListPage> {
   }
 
   Widget _buildRequestList(RequestsState state) {
+    // Show skeleton loading for initial load
     if (state.isLoading && state.requests.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return SkeletonLayouts.listScreen(itemCount: 8);
     }
 
-    if (state.error != null) {
-      return _buildErrorState(state.error!);
+    // Show error state with retry
+    if (state.error != null && state.requests.isEmpty) {
+      final isNetworkError = state.error!.toLowerCase().contains('network');
+      return isNetworkError 
+          ? EmptyStates.networkError(
+              onRetry: () {
+                final analytics = ref.read(analyticsProvider);
+                AnalyticsHelper.trackAction(analytics, 'retry_network_error', context: {
+                  'screen': 'requests_list',
+                });
+                ref.read(requestsServiceProvider).refresh();
+              },
+            )
+          : EmptyStates.serverError(
+              onRetry: () {
+                final analytics = ref.read(analyticsProvider);
+                AnalyticsHelper.trackAction(analytics, 'retry_server_error', context: {
+                  'screen': 'requests_list',
+                });
+                ref.read(requestsServiceProvider).refresh();
+              },
+            );
     }
 
+    // Show appropriate empty state
     if (state.requests.isEmpty) {
-      return _buildEmptyState();
+      if (state.filters.hasActiveFilters) {
+        if (state.filters.searchQuery != null && state.filters.searchQuery!.isNotEmpty) {
+          return EmptyStates.noSearchResults(
+            query: state.filters.searchQuery!,
+            onClearSearch: () {
+              _searchController.clear();
+              _onSearchChanged('');
+              final analytics = ref.read(analyticsProvider);
+              AnalyticsHelper.trackAction(analytics, 'clear_search', context: {
+                'screen': 'requests_list',
+              });
+            },
+          );
+        } else {
+          return EmptyStates.noFilteredResults(
+            onClearFilters: () {
+              ref.read(requestsServiceProvider).clearFilters();
+              final analytics = ref.read(analyticsProvider);
+              AnalyticsHelper.trackAction(analytics, 'clear_filters', context: {
+                'screen': 'requests_list',
+              });
+            },
+          );
+        }
+      } else {
+        return EmptyStates.noRequests(
+          onCreateRequest: () {
+            final analytics = ref.read(analyticsProvider);
+            AnalyticsHelper.trackAction(analytics, 'create_first_request', context: {
+              'from_empty_state': true,
+            });
+            context.go('/requests/new');
+          },
+        );
+      }
     }
 
+    // Show list with pull-to-refresh and pagination
     return RefreshIndicator(
-      onRefresh: _onRefresh,
+      onRefresh: () async {
+        final analytics = ref.read(analyticsProvider);
+        AnalyticsHelper.trackAction(analytics, 'pull_to_refresh', context: {
+          'screen': 'requests_list',
+          'item_count': state.requests.length,
+        });
+        
+        await ref.read(requestsServiceProvider).refresh();
+        
+        if (mounted) {
+          context.showSuccessToast('Requests refreshed');
+        }
+      },
       child: ListView.builder(
         controller: _scrollController,
         padding: const EdgeInsets.all(AppTheme.spacingM),
-        itemCount: state.requests.length + (state.isLoadingMore ? 1 : 0),
+        itemCount: state.requests.length + (state.hasMore ? 1 : 0),
         itemBuilder: (context, index) {
-          if (index == state.requests.length) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(AppTheme.spacingM),
-                child: CircularProgressIndicator(),
+          if (index >= state.requests.length) {
+            // Loading indicator for pagination
+            return const Padding(
+              padding: EdgeInsets.all(AppTheme.spacingL),
+              child: Center(
+                child: CircularProgressIndicator(
+                  semanticsLabel: 'Loading more requests',
+                ),
               ),
             );
           }
-          
+
           final request = state.requests[index];
-          return _buildRequestCard(request);
+          return _RequestCard(
+            key: ValueKey(request.id),
+            request: request,
+            onTap: () {
+              final analytics = ref.read(analyticsProvider);
+              AnalyticsHelper.trackAction(analytics, 'view_request_detail', context: {
+                'request_id_length': request.id?.length ?? 0,
+                'status': request.status.value,
+                'priority': request.priority.value,
+              });
+              context.go('/requests/${request.id}');
+            },
+          );
         },
       ),
     );
