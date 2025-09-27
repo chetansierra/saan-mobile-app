@@ -567,7 +567,15 @@ class BillingService extends ChangeNotifier {
 
   /// Refresh billing data
   Future<void> refresh() async {
+    _cancelToken = Object();
+    _searchDebounceTimer?.cancel();
     await loadInvoices(refresh: true);
+  }
+
+  @override
+  void dispose() {
+    _searchDebounceTimer?.cancel();
+    super.dispose();
   }
 }
 
