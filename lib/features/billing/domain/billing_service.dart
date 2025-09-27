@@ -27,6 +27,13 @@ class BillingService extends ChangeNotifier {
   final BillingRepository _repository = BillingRepository.instance;
 
   BillingState _state = const BillingState();
+  
+  // Search debouncing
+  Timer? _searchDebounceTimer;
+  String? _pendingSearchQuery;
+  
+  // Request cancellation
+  var _cancelToken = Object();
 
   /// Current billing state
   BillingState get state => _state;
