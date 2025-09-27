@@ -224,6 +224,8 @@ abstract class SupabaseTables {
   static const String requests = 'requests';
   static const String pmVisits = 'pm_visits';
   static const String invoices = 'invoices';
+  static const String invoiceLines = 'invoice_lines';
+  static const String paymentAttempts = 'payment_attempts';
   static const String subscriptions = 'subscriptions';
   static const String auditLogs = 'audit_logs';
 }
