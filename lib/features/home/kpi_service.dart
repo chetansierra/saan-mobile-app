@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../auth/domain/auth_service.dart';
 import '../requests/data/requests_repository.dart';
 import '../requests/domain/models/request.dart';
+import '../billing/data/billing_repository.dart';
 
 /// Provider for KpiService
 final kpiServiceProvider = ChangeNotifierProvider<KpiService>((ref) {
