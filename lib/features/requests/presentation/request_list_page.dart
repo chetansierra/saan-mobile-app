@@ -606,3 +606,245 @@ class _RequestListPageState extends ConsumerState<RequestListPage> {
     );
   }
 }
+
+/// Memoized request card component for better performance
+class _RequestCard extends StatelessWidget {
+  const _RequestCard({
+    super.key,
+    required this.request,
+    required this.onTap,
+  });
+
+  final ServiceRequest request;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.cardBorderRadius),
+        child: Semantics(
+          label: 'Request ${request.description}. Status: ${request.status.displayName}. Priority: ${request.priority.displayName}',
+          button: true,
+          child: Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingM),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header row with status and priority
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        request.description,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: AppTheme.spacingS),
+                    _StatusBadge(status: request.status),
+                  ],
+                ),
+                
+                const SizedBox(height: AppTheme.spacingS),
+                
+                // Facility and date info
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (request.facilityName != null) ...[
+                            Text(
+                              request.facilityName!,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                          ],
+                          Text(
+                            'Created ${DateFormat('MMM dd, yyyy').format(request.createdAt ?? DateTime.now())}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _PriorityChip(priority: request.priority),
+                  ],
+                ),
+                
+                // SLA indicator if exists
+                if (request.slaDueAt != null) ...[
+                  const SizedBox(height: AppTheme.spacingS),
+                  _SLAIndicator(dueAt: request.slaDueAt!),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Status badge component
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({required this.status});
+
+  final RequestStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Color(int.parse('0xFF${status.colorHex.substring(1)}'));
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Text(
+        status.displayName,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+        semanticsLabel: 'Status: ${status.displayName}',
+      ),
+    );
+  }
+}
+
+/// Priority chip component
+class _PriorityChip extends StatelessWidget {
+  const _PriorityChip({required this.priority});
+
+  final RequestPriority priority;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Color(int.parse('0xFF${priority.colorHex.substring(1)}'));
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            priority.icon,
+            size: 12,
+            color: color,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            priority.displayName,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+            semanticsLabel: 'Priority: ${priority.displayName}',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// SLA indicator component
+class _SLAIndicator extends StatelessWidget {
+  const _SLAIndicator({required this.dueAt});
+
+  final DateTime dueAt;
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final isOverdue = now.isAfter(dueAt);
+    final timeRemaining = dueAt.difference(now);
+    
+    Color color;
+    String text;
+    IconData icon;
+    
+    if (isOverdue) {
+      color = Colors.red;
+      final overdueDuration = now.difference(dueAt);
+      text = 'SLA breached ${_formatDuration(overdueDuration)} ago';
+      icon = Icons.warning;
+    } else if (timeRemaining.inHours <= 2) {
+      color = Colors.orange;
+      text = 'SLA due in ${_formatDuration(timeRemaining)}';
+      icon = Icons.schedule;
+    } else {
+      color = Colors.green;
+      text = 'SLA due in ${_formatDuration(timeRemaining)}';
+      icon = Icons.check_circle_outline;
+    }
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 14,
+            color: color,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+            semanticsLabel: text,
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDuration(Duration duration) {
+    if (duration.inDays > 0) {
+      return '${duration.inDays}d';
+    } else if (duration.inHours > 0) {
+      return '${duration.inHours}h';
+    } else {
+      return '${duration.inMinutes}m';
+    }
+  }
+}
