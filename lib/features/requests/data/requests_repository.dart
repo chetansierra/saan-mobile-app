@@ -483,6 +483,10 @@ class RequestKPIs extends Equatable {
     this.pmUpcoming = 0,
     this.pmDueToday = 0,
     this.pmOverdue = 0,
+    this.unpaidInvoices = 0,
+    this.overdueInvoices = 0,
+    this.outstandingAmount = 0.0,
+    this.monthlyRevenue = 0.0,
   });
 
   final int openRequests;
@@ -497,6 +501,12 @@ class RequestKPIs extends Equatable {
   final int pmUpcoming;
   final int pmDueToday;
   final int pmOverdue;
+  
+  // Billing metrics
+  final int unpaidInvoices;
+  final int overdueInvoices;
+  final double outstandingAmount;
+  final double monthlyRevenue;
 
   @override
   List<Object?> get props => [
