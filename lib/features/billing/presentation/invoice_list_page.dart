@@ -574,3 +574,174 @@ class _CreateInvoiceSheet extends ConsumerWidget {
     );
   }
 }
+
+/// Optimized invoice card widget with memoization and accessibility
+class _InvoiceCard extends StatelessWidget {
+  const _InvoiceCard({
+    required this.invoice,
+    required this.onTap,
+    super.key,
+  });
+
+  final Invoice invoice;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.cardBorderRadius),
+        child: Semantics(
+          label: 'Invoice ${invoice.invoiceNumber} for ${invoice.customerInfo.name}, amount ₹${invoice.total.toStringAsFixed(2)}, status ${invoice.status.displayName}${invoice.isOverdue ? ', overdue' : ''}',
+          hint: 'Tap to view invoice details',
+          child: Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingM),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header row with invoice number and status
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            invoice.invoiceNumber,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            semanticsLabel: 'Invoice number ${invoice.invoiceNumber}',
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            invoice.customerInfo.name,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                            semanticsLabel: 'Customer ${invoice.customerInfo.name}',
+                          ),
+                        ],
+                      ),
+                    ),
+                    _StatusBadge(status: invoice.status),
+                  ],
+                ),
+                
+                const SizedBox(height: AppTheme.spacingM),
+                
+                // Amount and dates row
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Amount',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          Text(
+                            '₹${invoice.total.toStringAsFixed(2)}',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: invoice.isOverdue ? Colors.red : null,
+                            ),
+                            semanticsLabel: 'Amount ₹${invoice.total.toStringAsFixed(2)}',
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Due Date',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          Text(
+                            DateFormat('MMM dd, yyyy').format(invoice.dueDate),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: invoice.isOverdue ? Colors.red : null,
+                            ),
+                            semanticsLabel: 'Due date ${DateFormat('MMMM dd, yyyy').format(invoice.dueDate)}',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                
+                // Overdue indicator
+                if (invoice.isOverdue)
+                  Padding(
+                    padding: const EdgeInsets.only(top: AppTheme.spacingS),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.warning,
+                          color: Colors.red,
+                          size: 16,
+                          semanticLabel: 'Warning: overdue',
+                        ),
+                        const SizedBox(width: AppTheme.spacingXS),
+                        Text(
+                          'Overdue by ${-invoice.daysUntilDue} days',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Memoized status badge widget for better performance
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({required this.status});
+  
+  final InvoiceStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Color(int.parse('0xFF${status.colorHex.substring(1)}'));
+    
+    return Container(
+      constraints: const BoxConstraints(minHeight: 44), // Accessibility: min touch target
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacingS,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Text(
+        status.displayName,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
