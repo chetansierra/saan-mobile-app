@@ -106,8 +106,6 @@ class _RequestListPageState extends ConsumerState<RequestListPage> {
             tooltip: 'Filter requests',
           ),
         ],
-        ),
-      ],
       ),
       body: Stack(
         children: [
