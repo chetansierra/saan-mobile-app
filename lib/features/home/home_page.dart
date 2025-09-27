@@ -162,6 +162,14 @@ class _HomePageState extends ConsumerState<HomePage> {
         
         // PM counters
         _buildPMCountersGrid(kpis),
+        
+        const SizedBox(height: AppTheme.spacingL),
+        
+        // Unpaid invoices alert (if any unpaid invoices)
+        if (kpis.unpaidInvoices > 0) ...[
+          _buildUnpaidInvoicesCard(kpis.unpaidInvoices, kpis.outstandingAmount),
+          const SizedBox(height: AppTheme.spacingM),
+        ],
       ],
     );
   }
