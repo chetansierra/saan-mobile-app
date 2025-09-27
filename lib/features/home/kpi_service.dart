@@ -17,6 +17,7 @@ class KpiService extends ChangeNotifier {
 
   final AuthService _authService;
   final RequestsRepository _repository = RequestsRepository.instance;
+  final BillingRepository _billingRepository = BillingRepository.instance;
 
   KpiState _state = const KpiState();
 
