@@ -23,15 +23,39 @@ class InvoiceListPage extends ConsumerStatefulWidget {
 class _InvoiceListPageState extends ConsumerState<InvoiceListPage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
+  late final DateTime _pageLoadTime;
 
   @override
   void initState() {
     super.initState();
+    _pageLoadTime = DateTime.now();
     _scrollController.addListener(_onScroll);
     
-    // Initialize billing service
+    // Initialize billing service and track analytics
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(billingServiceProvider).initialize();
+      _trackScreenView();
+      ref.read(billingServiceProvider).initialize().then(_trackListLoad);
+    });
+  }
+
+  void _trackScreenView() {
+    final analytics = ref.read(analyticsProvider);
+    analytics.trackEvent('screen_view', {
+      'name': 'invoice_list',
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+  }
+
+  void _trackListLoad(dynamic _) {
+    final analytics = ref.read(analyticsProvider);
+    final billingState = ref.read(billingServiceProvider).state;
+    final duration = DateTime.now().difference(_pageLoadTime);
+
+    analytics.trackEvent('list_load', {
+      'duration_ms': duration.inMilliseconds,
+      'item_count': billingState.invoices.length,
+      'page_size': 20,
+      'timestamp': DateTime.now().toIso8601String(),
     });
   }
 
