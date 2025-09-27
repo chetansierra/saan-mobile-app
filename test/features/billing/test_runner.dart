@@ -30,6 +30,14 @@ void main() {
     group('🔧 Integration Tests', () {
       integration_tests.main();
     });
+
+    group('🔑 Cursor Keyset Logic Tests', () {
+      cursor_keyset_tests.main();
+    });
+
+    group('🚫 Row Rebuild Prevention Tests', () {
+      row_rebuild_tests.main();
+    });
   });
 
   group('Performance Budget Validation', () {
