@@ -518,9 +518,45 @@ class RequestKPIs extends Equatable {
         pmUpcoming,
         pmDueToday,
         pmOverdue,
+        unpaidInvoices,
+        overdueInvoices,
+        outstandingAmount,
+        monthlyRevenue,
       ];
+
+  /// Create a copy with updated fields
+  RequestKPIs copyWith({
+    int? openRequests,
+    int? overdueRequests,
+    int? dueTodayRequests,
+    double? avgTtrHours,
+    int? expiringContracts,
+    int? pmUpcoming,
+    int? pmDueToday,
+    int? pmOverdue,
+    int? unpaidInvoices,
+    int? overdueInvoices,
+    double? outstandingAmount,
+    double? monthlyRevenue,
+  }) {
+    return RequestKPIs(
+      openRequests: openRequests ?? this.openRequests,
+      overdueRequests: overdueRequests ?? this.overdueRequests,
+      dueTodayRequests: dueTodayRequests ?? this.dueTodayRequests,
+      avgTtrHours: avgTtrHours ?? this.avgTtrHours,
+      expiringContracts: expiringContracts ?? this.expiringContracts,
+      pmUpcoming: pmUpcoming ?? this.pmUpcoming,
+      pmDueToday: pmDueToday ?? this.pmDueToday,
+      pmOverdue: pmOverdue ?? this.pmOverdue,
+      unpaidInvoices: unpaidInvoices ?? this.unpaidInvoices,
+      overdueInvoices: overdueInvoices ?? this.overdueInvoices,
+      outstandingAmount: outstandingAmount ?? this.outstandingAmount,
+      monthlyRevenue: monthlyRevenue ?? this.monthlyRevenue,
+    );
+  }
 
   @override
   String toString() => 'RequestKPIs(open: $openRequests, overdue: $overdueRequests, '
-      'dueToday: $dueTodayRequests, avgTTR: ${avgTtrHours.toStringAsFixed(1)}h)';
+      'dueToday: $dueTodayRequests, avgTTR: ${avgTtrHours.toStringAsFixed(1)}h, '
+      'unpaidInvoices: $unpaidInvoices)';
 }
