@@ -569,6 +569,11 @@ class _CreateInvoiceSheet extends ConsumerWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
+                final analytics = ref.read(analyticsProvider);
+                analytics.trackEvent('pay_attempt_initiated', {
+                  'method': 'select_requests',
+                  'timestamp': DateTime.now().toIso8601String(),
+                });
                 Navigator.of(context).pop();
                 context.go('/requests?status=closed');
               },
