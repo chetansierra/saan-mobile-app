@@ -739,7 +739,20 @@ class _PriorityChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Color(int.parse('0xFF${priority.colorHex.substring(1)}'));
+    // Define colors and icons for priorities
+    final Color color;
+    final IconData icon;
+    
+    switch (priority) {
+      case RequestPriority.critical:
+        color = Colors.red;
+        icon = Icons.priority_high;
+        break;
+      case RequestPriority.standard:
+        color = Colors.blue;
+        icon = Icons.low_priority;
+        break;
+    }
     
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -754,7 +767,7 @@ class _PriorityChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            priority.icon,
+            icon,
             size: 12,
             color: color,
           ),
