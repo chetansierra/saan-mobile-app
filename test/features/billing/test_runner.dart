@@ -7,6 +7,11 @@ import 'performance_test.dart' as performance_tests;
 import 'integration_test.dart' as integration_tests;
 import 'cursor_keyset_test.dart' as cursor_keyset_tests;
 import 'row_rebuilds_test.dart' as row_rebuild_tests;
+import 'cursor_boundary_test.dart' as cursor_boundary_tests;
+import 'pagination_realtime_race_test.dart' as pagination_realtime_tests;
+import 'error_retry_state_test.dart' as error_retry_tests;
+import 'a11y_live_region_test.dart' as a11y_live_region_tests;
+import 'row_key_stability_test.dart' as row_key_stability_tests;
 
 /// Test runner for all InvoiceListPage performance and functionality tests
 void main() {
