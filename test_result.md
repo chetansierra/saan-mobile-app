@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-## user_problem_statement: "Complete the request detail page with the exact layout specified: Header (sticky): [Request #ID] • [Status chip] • [Priority chip], Top row: [SLA Badge (countdown)] [Assignee Picker], Sections (scroll): 1) Details: facility, createdAt, createdBy, description, 2) Attachments: AttachmentGallery, 3) Timeline: StatusTimeline, 4) Notes (optional): list of admin notes, Bottom bar (sticky for admins): [Update Status] [Assign Engineer]"
+## user_problem_statement: "Test the Round 7 Billing (Invoices) + PhonePe Launcher implementation for Flutter facility management app. Focus on testing: Domain Models (Invoice, InvoiceLine, PaymentAttempt), Repository Testing (BillingRepository CRUD operations), Service Layer Testing (BillingService business logic), Integration Testing (KPI integration, PhonePe integration), Business Logic Validation (invoice generation, status transitions, totals calculation), and ensure proper tenant isolation and error handling."
 
 ## backend:
   - task: "Add getAvailableAssignees method to RequestsRepository"
