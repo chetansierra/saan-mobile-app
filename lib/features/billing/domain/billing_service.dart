@@ -376,14 +376,50 @@ class BillingService extends ChangeNotifier {
     }
   }
 
-  /// Apply filters to invoice list
+  /// Apply filters to invoice list with debouncing for search
   Future<void> applyFilters(InvoiceFilters filters) async {
-    await loadInvoices(filters: filters, refresh: true);
+    // Cancel any pending requests
+    _cancelToken = Object();
+    
+    // If search query changed, debounce it
+    if (filters.searchQuery != _state.filters.searchQuery) {
+      _pendingSearchQuery = filters.searchQuery;
+      _searchDebounceTimer?.cancel();
+      
+      if (filters.searchQuery?.trim().isEmpty == true || filters.searchQuery == null) {
+        // Empty search - apply immediately
+        await loadInvoices(filters: filters.copyWith(searchQuery: null), refresh: true);
+      } else {
+        // Debounce search
+        _searchDebounceTimer = Timer(const Duration(milliseconds: 320), () async {
+          if (_pendingSearchQuery == filters.searchQuery) {
+            await loadInvoices(filters: filters, refresh: true);
+          }
+        });
+      }
+    } else {
+      // Non-search filters - apply immediately
+      await loadInvoices(filters: filters, refresh: true);
+    }
   }
 
   /// Clear filters
   Future<void> clearFilters() async {
+    _cancelToken = Object();
+    _searchDebounceTimer?.cancel();
+    _pendingSearchQuery = null;
     await loadInvoices(filters: const InvoiceFilters(), refresh: true);
+  }
+
+  /// Load more invoices using cursor pagination
+  Future<void> loadMore() async {
+    if (_state.hasMore && !_state.isLoading && _state.cursor != null) {
+      await loadInvoices(
+        page: _state.currentPage + 1,
+        filters: _state.filters,
+        cursor: _state.cursor,
+      );
+    }
   }
 
   /// Delete draft invoice
