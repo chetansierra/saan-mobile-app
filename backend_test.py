@@ -1,25 +1,29 @@
 #!/usr/bin/env python3
 """
-Backend Testing Suite for Flutter/Supabase Request Detail Page Implementation
+Backend Testing Suite for Round 7 Billing (Invoices) + PhonePe Launcher Implementation
 
-This test suite validates the backend data layer implementation for:
-1. RequestsRepository.getAvailableAssignees method
-2. RequestsService.getAvailableAssignees method  
-3. StorageHelper.getSignedUrl method
-4. Existing request status update functionality
-5. Existing engineer assignment functionality
+This comprehensive test suite validates the Flutter billing implementation including:
+1. Domain Models: Invoice, InvoiceLine, PaymentAttempt with business logic
+2. Repository Layer: BillingRepository CRUD operations and data integrity
+3. Service Layer: BillingService business logic and admin operations
+4. PhonePe Integration: Payment utilities and deeplink generation
+5. KPI Integration: Billing metrics and dashboard data
+6. Business Logic: Invoice generation, status transitions, totals calculation
+7. Tenant Isolation: Multi-tenant data security
+8. Error Handling: Validation and exception management
 
-Focus: Multi-tenant isolation, RLS compliance, proper error handling, admin role validation
+Focus: Comprehensive validation of billing system implementation as per MVP requirements
 """
 
 import asyncio
 import json
 import sys
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
+import re
 
-class FlutterSupabaseBackendTester:
+class BillingBackendTester:
     """Test suite for Flutter/Supabase backend data layer"""
     
     def __init__(self):
