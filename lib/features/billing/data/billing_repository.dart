@@ -101,16 +101,17 @@ class BillingRepository {
     }
   }
 
-  /// List invoices with pagination and filtering
+  /// List invoices with cursor-based pagination and filtering
   Future<PaginatedInvoices> listInvoices({
     required String tenantId,
     String? status,
     int page = 1,
     int pageSize = 20,
     InvoiceFilters? filters,
+    InvoiceCursor? cursor,
   }) async {
     try {
-      debugPrint('💰 Listing invoices for tenant: $tenantId (page: $page)');
+      debugPrint('💰 Listing invoices for tenant: $tenantId (page: $page, cursor: ${cursor != null})');
 
       var query = _client
           .from(SupabaseTables.invoices)
@@ -126,22 +127,57 @@ class BillingRepository {
         query = _applyInvoiceFilters(query, filters);
       }
 
-      // Apply pagination
-      final offset = (page - 1) * pageSize;
-      query = query
-          .order('created_at', ascending: false)
-          .range(offset, offset + pageSize - 1);
+      // Apply cursor-based pagination (preferred for performance)
+      if (cursor != null && cursor.isValid) {
+        query = query
+            .or('issue_date.lt.${cursor.issueDate.toIso8601String()},and(issue_date.eq.${cursor.issueDate.toIso8601String()},id.lt.${cursor.id})')
+            .order('issue_date', ascending: false)
+            .order('id', ascending: false)
+            .limit(pageSize + 1); // +1 to check if there are more records
+      } else {
+        // Fallback to offset-based pagination for first page or complex searches
+        final offset = (page - 1) * pageSize;
+        query = query
+            .order('issue_date', ascending: false)
+            .order('id', ascending: false)
+            .range(offset, offset + pageSize - 1);
+      }
 
       final response = await query;
       final total = response.count ?? 0;
 
-      final invoices = (response.data as List)
+      var invoices = (response.data as List)
           .map((json) => Invoice.fromJson(json))
           .toList();
 
-      final hasMore = (offset + invoices.length) < total;
+      bool hasMore;
+      InvoiceCursor? nextCursor;
 
-      debugPrint('✅ Found ${invoices.length} invoices (total: $total)');
+      if (cursor != null && cursor.isValid) {
+        // Cursor-based pagination
+        hasMore = invoices.length > pageSize;
+        if (hasMore) {
+          invoices = invoices.take(pageSize).toList(); // Remove the extra record
+          final lastInvoice = invoices.last;
+          nextCursor = InvoiceCursor(
+            issueDate: lastInvoice.issueDate,
+            id: lastInvoice.id!,
+          );
+        }
+      } else {
+        // Offset-based pagination
+        final offset = (page - 1) * pageSize;
+        hasMore = (offset + invoices.length) < total;
+        if (hasMore && invoices.isNotEmpty) {
+          final lastInvoice = invoices.last;
+          nextCursor = InvoiceCursor(
+            issueDate: lastInvoice.issueDate,
+            id: lastInvoice.id!,
+          );
+        }
+      }
+
+      debugPrint('✅ Found ${invoices.length} invoices (total: $total, hasMore: $hasMore)');
 
       return PaginatedInvoices(
         invoices: invoices,
@@ -149,6 +185,7 @@ class BillingRepository {
         page: page,
         pageSize: pageSize,
         hasMore: hasMore,
+        cursor: nextCursor,
       );
     } catch (e) {
       debugPrint('❌ Failed to list invoices: $e');
