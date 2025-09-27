@@ -5,6 +5,8 @@ import 'pagination_test.dart' as pagination_tests;
 import 'accessibility_test.dart' as accessibility_tests;
 import 'performance_test.dart' as performance_tests;
 import 'integration_test.dart' as integration_tests;
+import 'cursor_keyset_test.dart' as cursor_keyset_tests;
+import 'row_rebuilds_test.dart' as row_rebuild_tests;
 
 /// Test runner for all InvoiceListPage performance and functionality tests
 void main() {
