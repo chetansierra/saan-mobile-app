@@ -372,6 +372,13 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage> {
   }
 
   void _removeStatusFilter(InvoiceStatus status) {
+    final analytics = ref.read(analyticsProvider);
+    analytics.trackEvent('filter_change', {
+      'action': 'remove_status',
+      'status': status.value,
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+
     final currentFilters = ref.read(billingServiceProvider).state.filters;
     final newStatuses = List<InvoiceStatus>.from(currentFilters.statuses)
       ..remove(status);
@@ -381,6 +388,12 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage> {
   }
 
   void _removeOverdueFilter() {
+    final analytics = ref.read(analyticsProvider);
+    analytics.trackEvent('filter_change', {
+      'action': 'remove_overdue',
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+
     final currentFilters = ref.read(billingServiceProvider).state.filters;
     final newFilters = currentFilters.copyWith(isOverdue: null);
     ref.read(billingServiceProvider).applyFilters(newFilters);
