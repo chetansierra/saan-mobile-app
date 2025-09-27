@@ -50,13 +50,23 @@ class KpiService extends ChangeNotifier {
       final futures = await Future.wait([
         _repository.getKPIs(tenantId),
         _repository.getRecentRequests(tenantId: tenantId, limit: 5),
+        _billingRepository.getBillingKPIs(tenantId),
       ]);
 
-      final kpis = futures[0] as RequestKPIs;
+      final requestKpis = futures[0] as RequestKPIs;
       final recentRequests = futures[1] as List<ServiceRequest>;
+      final billingKpis = futures[2] as BillingKPIs;
+
+      // Combine KPIs
+      final combinedKpis = requestKpis.copyWith(
+        unpaidInvoices: billingKpis.unpaidInvoices,
+        overdueInvoices: billingKpis.overdueInvoices,
+        outstandingAmount: billingKpis.outstandingAmount,
+        monthlyRevenue: billingKpis.monthlyRevenue,
+      );
 
       _updateState(_state.copyWith(
-        kpis: kpis,
+        kpis: combinedKpis,
         recentRequests: recentRequests,
         isLoading: false,
         error: null,
