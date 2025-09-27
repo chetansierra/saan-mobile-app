@@ -222,76 +222,108 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage> {
   }
 
   Widget _buildInvoiceList(BillingState state) {
+    // Loading skeleton for initial load
     if (state.isLoading && state.invoices.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return SkeletonLayouts.listScreen(itemCount: 8);
     }
 
+    // Error state with retry functionality  
     if (state.error != null && state.invoices.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.grey),
-            const SizedBox(height: AppTheme.spacingM),
-            Text(
-              'Failed to load invoices',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: AppTheme.spacingS),
-            Text(
-              state.error!,
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppTheme.spacingM),
-            ElevatedButton(
-              onPressed: () => ref.read(billingServiceProvider).refresh(),
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
+      final analytics = ref.read(analyticsProvider);
+      analytics.trackEvent('error_surface', {
+        'category': 'list_load_error',
+        'timestamp': DateTime.now().toIso8601String(),
+      });
+
+      return EmptyStates.serverError(
+        onRetry: () {
+          analytics.trackEvent('retry_after_error', {
+            'context': 'invoice_list',
+            'timestamp': DateTime.now().toIso8601String(),
+          });
+          ref.read(billingServiceProvider).refresh();
+        },
       );
     }
 
+    // Empty state based on filters
     if (state.invoices.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.receipt_long, size: 64, color: Colors.grey),
-            const SizedBox(height: AppTheme.spacingM),
-            Text(
-              'No invoices found',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: AppTheme.spacingS),
-            const Text('Invoices will appear here when created'),
-          ],
-        ),
-      );
+      if (state.filters.hasActiveFilters) {
+        return EmptyStates.noFilteredResults(
+          onClearFilters: () {
+            _searchController.clear();
+            ref.read(billingServiceProvider).clearFilters();
+          },
+        );
+      } else {
+        return EmptyStates.noInvoices(
+          onCreateInvoice: () => context.go('/requests?status=closed'),
+        );
+      }
     }
 
+    // Optimized list with refresh and load more
     return RefreshIndicator(
-      onRefresh: () => ref.read(billingServiceProvider).refresh(),
+      onRefresh: () async {
+        final analytics = ref.read(analyticsProvider);
+        analytics.trackEvent('pull_to_refresh', {
+          'screen': 'invoice_list',
+          'timestamp': DateTime.now().toIso8601String(),
+        });
+        await ref.read(billingServiceProvider).refresh();
+      },
       child: ListView.builder(
         controller: _scrollController,
-        padding: const EdgeInsets.all(AppTheme.spacingM),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingM),
+        // Use itemExtent for better performance if items have consistent height
+        // itemExtent: 140, // Uncomment if all cards have same height
         itemCount: state.invoices.length + (state.hasMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index >= state.invoices.length) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(AppTheme.spacingM),
-                child: CircularProgressIndicator(),
+            // Load more footer
+            return Container(
+              padding: const EdgeInsets.all(AppTheme.spacingL),
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: AppTheme.spacingM),
+                  Text(
+                    'Loading more invoices...',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
               ),
             );
           }
 
           final invoice = state.invoices[index];
-          return _buildInvoiceCard(invoice);
+          return _InvoiceCard(
+            key: ValueKey(invoice.id),
+            invoice: invoice,
+            onTap: () => _onInvoiceCardTap(invoice),
+          );
         },
       ),
     );
+  }
+
+  void _onInvoiceCardTap(Invoice invoice) {
+    final analytics = ref.read(analyticsProvider);
+    analytics.trackEvent('row_open', {
+      'status': invoice.status.value,
+      'has_balance': invoice.total > 0,
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+
+    context.go('/billing/${invoice.id}');
   }
 
   Widget _buildInvoiceCard(Invoice invoice) {
