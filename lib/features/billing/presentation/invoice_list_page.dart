@@ -93,6 +93,18 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage> {
   void _onSearchChanged(String query) {
     final currentFilters = ref.read(billingServiceProvider).state.filters;
     final newFilters = currentFilters.copyWith(searchQuery: query.isEmpty ? null : query);
+    
+    // Track search
+    if (query.trim().isNotEmpty && currentFilters.searchQuery != query) {
+      final analytics = ref.read(analyticsProvider);
+      final startTime = DateTime.now();
+      
+      analytics.trackEvent('search_commit', {
+        'query_len': query.length,
+        'timestamp': startTime.toIso8601String(),
+      });
+    }
+
     ref.read(billingServiceProvider).applyFilters(newFilters);
   }
 
