@@ -17,6 +17,8 @@ import '../features/contracts/presentation/create_contract_page.dart';
 import '../features/contracts/presentation/contract_detail_page.dart';
 import '../features/pm/presentation/pm_schedule_page.dart';
 import '../features/pm/presentation/pm_visit_detail_page.dart';
+import '../features/billing/presentation/invoice_list_page.dart';
+import '../features/billing/presentation/invoice_detail_page.dart';
 
 /// Router configuration provider for the app
 final appRouterProvider = Provider<GoRouter>((ref) {
