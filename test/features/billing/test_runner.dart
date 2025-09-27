@@ -43,6 +43,26 @@ void main() {
     group('🚫 Row Rebuild Prevention Tests', () {
       row_rebuild_tests.main();
     });
+
+    group('🎯 Cursor Boundary Edge Cases', () {
+      cursor_boundary_tests.main();
+    });
+
+    group('⚡ Pagination Realtime Race Conditions', () {
+      pagination_realtime_tests.main();
+    });
+
+    group('🔄 Error Retry State Preservation', () {
+      error_retry_tests.main();
+    });
+
+    group('♿ Accessibility Live Regions', () {
+      a11y_live_region_tests.main();
+    });
+
+    group('🔑 Row Key Stability', () {
+      row_key_stability_tests.main();
+    });
   });
 
   group('Performance Budget Validation', () {
