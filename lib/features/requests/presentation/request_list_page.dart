@@ -626,7 +626,7 @@ class _RequestCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppTheme.cardBorderRadius),
+        borderRadius: BorderRadius.circular(AppTheme.radiusM),
         child: Semantics(
           label: 'Request ${request.description}. Status: ${request.status.displayName}. Priority: ${request.priority.displayName}',
           button: true,
