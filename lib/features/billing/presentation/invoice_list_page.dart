@@ -352,11 +352,23 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage> {
   }
 
   void _showFilterSheet() {
+    final analytics = ref.read(analyticsProvider);
+    analytics.trackEvent('filter_sheet_opened', {
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+
     showModalBottomSheet(
       context: context,
       builder: (context) => _InvoiceFiltersSheet(
         currentFilters: ref.read(billingServiceProvider).state.filters,
         onFiltersChanged: (filters) {
+          analytics.trackEvent('filter_change', {
+            'filters_applied': filters.hasActiveFilters,
+            'status_count': filters.statuses.length,
+            'has_overdue': filters.isOverdue,
+            'has_search': filters.searchQuery?.isNotEmpty,
+            'timestamp': DateTime.now().toIso8601String(),
+          });
           ref.read(billingServiceProvider).applyFilters(filters);
         },
       ),
@@ -364,6 +376,11 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage> {
   }
 
   void _showCreateInvoiceSheet() {
+    final analytics = ref.read(analyticsProvider);
+    analytics.trackEvent('create_invoice_sheet_opened', {
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
