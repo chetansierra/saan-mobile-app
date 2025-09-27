@@ -315,8 +315,13 @@
 
 ## test_plan:
   current_focus:
-    - "Refactor request detail page to match exact layout specification"
-  stuck_tasks: []
+    - "BillingRepository CRUD Operations"
+    - "BillingService Business Logic & Admin Operations"
+    - "KPI Integration & Billing Metrics"
+  stuck_tasks:
+    - "BillingRepository CRUD Operations"
+    - "BillingService Business Logic & Admin Operations"
+    - "KPI Integration & Billing Metrics"
   test_all: false
   test_priority: "high_first"
 
