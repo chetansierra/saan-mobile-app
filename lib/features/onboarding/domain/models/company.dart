@@ -316,18 +316,6 @@ enum OnboardingStep {
     }
   }
 
-  /// Step index (0-based)
-  int get index {
-    switch (this) {
-      case OnboardingStep.company:
-        return 0;
-      case OnboardingStep.facility:
-        return 1;
-      case OnboardingStep.review:
-        return 2;
-    }
-  }
-
   /// Total number of steps
   static int get totalSteps => 3;
 

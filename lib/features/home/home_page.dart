@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../app/theme.dart';
 import '../auth/domain/auth_service.dart';
 import '../requests/domain/models/request.dart';
+import '../requests/data/requests_repository.dart';
 import 'kpi_service.dart';
 
 /// Home dashboard page showing KPIs and recent activity

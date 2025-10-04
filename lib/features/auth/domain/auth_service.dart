@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 import '../../../core/supabase/client.dart';
 import '../../onboarding/data/onboarding_repository.dart';
@@ -37,6 +37,9 @@ class AuthService extends ChangeNotifier {
 
   /// Current user profile
   UserProfile? get currentProfile => _state.profile;
+
+  /// Alias for currentProfile (for consistency with other components)
+  UserProfile? get userProfile => _state.profile;
 
   /// Current user
   User? get currentUser => _state.user;

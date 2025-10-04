@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -73,6 +74,9 @@ class RequestsService extends ChangeNotifier {
       _updateState(_state.copyWithError(e.toString()));
     }
   }
+
+  /// Convenience method for refresh (alias for refreshRequests)
+  Future<void> refresh() async => refreshRequests();
 
   /// Load more requests (pagination)
   Future<void> loadMoreRequests() async {

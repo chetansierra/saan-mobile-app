@@ -654,76 +654,6 @@ class _RequestDetailPageState extends ConsumerState<RequestDetailPage> {
     );
   }
 
-  /// Build details section: facility, createdAt, createdBy, description
-  Widget _buildDetailsSection() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacingL),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.info_outline,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 20,
-                ),
-                const SizedBox(width: AppTheme.spacingS),
-                Text(
-                  'Request Details',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            
-            const SizedBox(height: AppTheme.spacingL),
-            
-            // Description with better typography
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(AppTheme.spacingM),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(AppTheme.radiusM),
-              ),
-              child: Text(
-                _request!.description,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  height: 1.5,
-                ),
-              ),
-            ),
-            
-            const SizedBox(height: AppTheme.spacingL),
-            
-            // Details grid
-            _buildDetailRow('Facility', _request!.facilityName ?? 'Unknown Facility', Icons.location_city),
-            _buildDetailRow('Created', DateFormat('MMM dd, yyyy HH:mm').format(_request!.createdAt ?? DateTime.now()), Icons.schedule),
-            _buildDetailRow('Type', _request!.type.displayName, Icons.category),
-            
-            if (_request!.preferredWindow != null)
-              _buildDetailRow(
-                'Preferred Window',
-                '${DateFormat('MMM dd, HH:mm').format(_request!.preferredWindow!.startTime)} - '
-                '${DateFormat('HH:mm').format(_request!.preferredWindow!.endTime)}',
-                Icons.access_time,
-              ),
-            
-            if (_request!.eta != null)
-              _buildDetailRow(
-                'ETA',
-                DateFormat('MMM dd, yyyy HH:mm').format(_request!.eta!),
-                Icons.schedule_send,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
   /// Build attachments section with gallery
   Widget _buildAttachmentsSection() {
     return Card(
@@ -850,17 +780,18 @@ class _RequestDetailPageState extends ConsumerState<RequestDetailPage> {
             ),
             const SizedBox(height: AppTheme.spacingM),
             
-            _buildDetailRow('Type', _request!.type.displayName),
-            _buildDetailRow('Priority', _request!.priority.displayName),
-            _buildDetailRow('Status', _request!.status.displayName),
+            _buildDetailRow('Type', _request!.type.displayName, Icons.category),
+            _buildDetailRow('Priority', _request!.priority.displayName, Icons.priority_high),
+            _buildDetailRow('Status', _request!.status.displayName, Icons.info),
             
             if (_request!.assignedEngineerName != null)
-              _buildDetailRow('Assigned To', _request!.assignedEngineerName!),
+              _buildDetailRow('Assigned To', _request!.assignedEngineerName!, Icons.person),
             
             if (_request!.eta != null)
               _buildDetailRow(
                 'ETA',
                 DateFormat('MMM dd, yyyy HH:mm').format(_request!.eta!),
+                Icons.schedule_send,
               ),
             
             if (_request!.preferredWindow != null)
@@ -868,6 +799,7 @@ class _RequestDetailPageState extends ConsumerState<RequestDetailPage> {
                 'Preferred Window',
                 '${DateFormat('MMM dd, HH:mm').format(_request!.preferredWindow!.startTime)} - '
                 '${DateFormat('HH:mm').format(_request!.preferredWindow!.endTime)}',
+                Icons.access_time,
               ),
           ],
         ),

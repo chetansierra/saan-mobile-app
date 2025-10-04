@@ -139,7 +139,6 @@ class _RequestListPageState extends ConsumerState<RequestListPage> {
         label: const Text('New Request'),
         icon: const Icon(Icons.add),
       ),
-      ),
     );
   }
 
@@ -215,6 +214,7 @@ class _RequestListPageState extends ConsumerState<RequestListPage> {
     return FilterChip(
       label: Text(label),
       selected: true,
+      onSelected: (_) {}, // Required parameter - empty callback since we handle onDeleted
       onDeleted: onDeleted,
     );
   }

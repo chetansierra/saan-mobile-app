@@ -23,7 +23,7 @@ dependencies:
   flutter_riverpod: ^2.5.1
   
   # UI components
-  material_color_utilities: ^0.8.0
+  material_color_utilities: ^0.11.1
   
   # Utilities
   intl: ^0.19.0
@@ -31,6 +31,9 @@ dependencies:
   
   # Image handling
   image_picker: ^1.0.7
+  
+  # File handling
+  file_picker: ^8.0.3
   
   # URL handling
   url_launcher: ^6.2.5
@@ -51,15 +54,10 @@ flutter:
 
   # Assets
   assets:
-    - assets/images/
-    - assets/icons/
+    - frontend/assets/images/
 
-  # Fonts (Material 3 uses system fonts by default)
+  # Fonts
   fonts:
-    - family: Roboto
+    - family: SpaceMono
       fonts:
-        - asset: assets/fonts/Roboto-Regular.ttf
-        - asset: assets/fonts/Roboto-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Roboto-Bold.ttf
-          weight: 700
+        - asset: frontend/assets/fonts/SpaceMono-Regular.ttf

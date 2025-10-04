@@ -44,8 +44,8 @@ void main() async {
 
   // Run the app
   runApp(
-    ProviderScope(
-      child: const CueronSaanApp(),
+    const ProviderScope(
+      child: CueronSaanApp(),
     ),
   );
 }
